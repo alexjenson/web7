@@ -2,16 +2,19 @@
 """
 Auto Job Application Script for Amrit Raju
 Searches Indeed for design jobs (remote + Greece), writes cover letters,
-and creates Gmail draft applications.
+and sends Gmail applications automatically.
 
 Usage:
     ANTHROPIC_API_KEY=sk-... python apply_jobs.py
 
 Requirements:
-    pip install anthropic
+    pip install anthropic google-api-python-client google-auth-httplib2 google-auth-oauthlib
+    Run gmail_setup.py once first to authorize Gmail.
     Must be run while a Claude Code session is active (reads session MCP config).
 """
 
+import base64
+import email as email_lib
 import glob
 import json
 import os
@@ -21,10 +24,14 @@ from datetime import datetime
 from pathlib import Path
 
 import anthropic
+from google.oauth2.credentials import Credentials
+from google.auth.transport.requests import Request
+from googleapiclient.discovery import build
 
 BASE_DIR = Path(__file__).parent
 STATE_FILE = BASE_DIR / "applied_jobs.json"
 REPORT_FILE = BASE_DIR / "job_applications_report.md"
+TOKEN_FILE = BASE_DIR / ".gmail_token.json"
 
 JOB_SEARCHES = [
     {"search": "UI/UX Designer",    "location": "remote",  "country_code": "US"},
@@ -47,10 +54,7 @@ Your job each run:
    - Paragraph 1: enthusiasm for the role and company, and most relevant experience.
    - Paragraph 2: 2-3 concrete skills/achievements from the resume that match the job requirements.
    - Sign off: "Best regards,\\nAmrit Raju\\namritgraphic4@gmail.com | +1 908 573 4841 | www.amritgraphic.com"
-7. Look for a recruiter/HR email address in the job details. If found, call create_draft with:
-   - to: [that email]
-   - subject: "Application for [Job Title] – Amrit Raju"
-   - body: the cover letter
+7. Look for a recruiter/HR email address in the job details. Extract it if present.
 8. After processing ALL jobs, return ONLY valid JSON (no markdown, no extra text) in this exact shape:
 {
   "applied_ids": ["id1", "id2", ...],
@@ -61,8 +65,7 @@ Your job each run:
       "company": "...",
       "location": "...",
       "apply_link": "...",
-      "draft_created": true,
-      "draft_to": "email@company.com or null",
+      "recipient_email": "email@company.com or null",
       "cover_letter": "full text of cover letter"
     }
   ]
@@ -96,16 +99,11 @@ def find_mcp_config() -> dict:
 
 
 def build_mcp_servers(config: dict) -> list:
-    target_ids = {
-        "c2485fb3-86b3-4b19-9735-0ab2cf178468",  # Indeed
-        "716eab36-8f80-4771-94e8-cca879f28420",  # Gmail
-    }
     servers = []
     for server_id, cfg in config["mcpServers"].items():
-        if server_id not in target_ids:
+        if server_id != "c2485fb3-86b3-4b19-9735-0ab2cf178468":
             continue
         server = {"type": "url", "url": cfg["url"], "name": server_id}
-        # Pass session header as authorization token if Anthropic proxy accepts it
         session_uuid = cfg.get("headers", {}).get("X-Session-UUID")
         if session_uuid:
             server["authorization_token"] = session_uuid
@@ -113,19 +111,53 @@ def build_mcp_servers(config: dict) -> list:
     return servers
 
 
+def get_gmail_service():
+    if not TOKEN_FILE.exists():
+        sys.exit(
+            "ERROR: Gmail not authorized. Run gmail_setup.py first."
+        )
+    token_data = json.loads(TOKEN_FILE.read_text())
+    creds = Credentials(
+        token=token_data.get("token"),
+        refresh_token=token_data["refresh_token"],
+        token_uri=token_data["token_uri"],
+        client_id=token_data["client_id"],
+        client_secret=token_data["client_secret"],
+        scopes=token_data["scopes"],
+    )
+    if creds.expired and creds.refresh_token:
+        creds.refresh(Request())
+        token_data["token"] = creds.token
+        TOKEN_FILE.write_text(json.dumps(token_data, indent=2))
+    return build("gmail", "v1", credentials=creds)
+
+
+def send_email(service, to: str, subject: str, body: str, sender: str = "me") -> str:
+    msg = email_lib.message.EmailMessage()
+    msg["To"] = to
+    msg["Subject"] = subject
+    msg.set_content(body)
+    raw = base64.urlsafe_b64encode(msg.as_bytes()).decode()
+    result = service.users().messages().send(
+        userId="me", body={"raw": raw}
+    ).execute()
+    return result.get("id", "")
+
+
 def run_agent(client: anthropic.Anthropic, mcp_servers: list, already_applied: list) -> dict:
     searches_json = json.dumps(JOB_SEARCHES, indent=2)
     applied_json = json.dumps(already_applied)
 
-    user_message = (
-        f"Please search for jobs and apply on my behalf.\n\n"
-        f"Job searches to run:\n{searches_json}\n\n"
-        f"ALREADY_APPLIED_IDS (skip these): {applied_json}"
-    )
+    messages = [{
+        "role": "user",
+        "content": (
+            f"Please search for jobs and apply on my behalf.\n\n"
+            f"Job searches to run:\n{searches_json}\n\n"
+            f"ALREADY_APPLIED_IDS (skip these): {applied_json}"
+        )
+    }]
 
-    messages = [{"role": "user", "content": user_message}]
-
-    print("Running job application agent...", flush=True)
+    print("Searching for jobs and writing cover letters...", flush=True)
 
     while True:
         response = client.beta.messages.create(
@@ -137,63 +169,51 @@ def run_agent(client: anthropic.Anthropic, mcp_servers: list, already_applied: l
             betas=["mcp-client-2025-04-04"],
         )
 
-        # Collect text and tool use blocks
-        tool_uses = []
         text_content = ""
+        tool_uses = []
         for block in response.content:
             if block.type == "text":
                 text_content += block.text
-            elif block.type == "tool_use":
-                tool_uses.append(block)
-            elif hasattr(block, "type") and "tool_use" in str(block.type):
+            elif hasattr(block, "id") and hasattr(block, "name"):
                 tool_uses.append(block)
 
         if response.stop_reason == "end_turn":
-            # Extract JSON from final text response
             raw = text_content.strip()
-            # Strip markdown fences if present
             raw = re.sub(r"^```[a-z]*\n?", "", raw)
             raw = re.sub(r"\n?```$", "", raw)
             try:
                 return json.loads(raw)
             except json.JSONDecodeError:
-                print(f"WARNING: Could not parse agent JSON output:\n{raw[:500]}", flush=True)
+                print(f"WARNING: Could not parse agent response.", flush=True)
                 return {"applied_ids": [], "report_entries": []}
 
         if response.stop_reason == "tool_use":
-            # Append assistant message and provide tool results placeholder
             messages.append({"role": "assistant", "content": response.content})
-
-            tool_results = []
-            for tool_use in tool_uses:
-                # MCP tool results are handled server-side; we just continue the loop
-                tool_results.append({
-                    "type": "tool_result",
-                    "tool_use_id": tool_use.id,
-                    "content": "Tool executed successfully.",
-                })
-
+            tool_results = [
+                {"type": "tool_result", "tool_use_id": t.id, "content": "Tool executed."}
+                for t in tool_uses
+            ]
             messages.append({"role": "user", "content": tool_results})
             continue
 
-        # Any other stop reason — break
         break
 
     return {"applied_ids": [], "report_entries": []}
 
 
 def write_report(entries: list, date_str: str) -> None:
+    sent = sum(1 for e in entries if e.get("sent"))
+    manual = len(entries) - sent
     lines = [
         f"# Job Application Report — {date_str}",
-        f"## Summary: {len(entries)} job(s) processed",
+        f"## Summary: {len(entries)} jobs | {sent} emails sent | {manual} apply via link",
         "",
     ]
     for e in entries:
-        status = (
-            f"Gmail draft created → {e.get('draft_to')}"
-            if e.get("draft_created")
-            else f"Apply manually: {e.get('apply_link', 'N/A')}"
-        )
+        if e.get("sent"):
+            status = f"Email sent to {e.get('recipient_email')}"
+        else:
+            status = f"Apply manually: {e.get('apply_link', 'N/A')}"
         lines += [
             f"### {e.get('title', 'Unknown')} @ {e.get('company', 'Unknown')}",
             f"- **Location:** {e.get('location', 'N/A')}",
@@ -217,38 +237,49 @@ def main() -> None:
 
     mcp_config = find_mcp_config()
     mcp_servers = build_mcp_servers(mcp_config)
-
     if not mcp_servers:
-        sys.exit("ERROR: Could not find Indeed/Gmail MCP servers in config.")
+        sys.exit("ERROR: Could not find Indeed MCP server in config.")
+
+    gmail = get_gmail_service()
 
     state = load_state()
     already_applied = state.get("applied_ids", [])
     print(f"Already applied to {len(already_applied)} job(s) in previous runs.", flush=True)
 
     client = anthropic.Anthropic(api_key=api_key)
-
     result = run_agent(client, mcp_servers, already_applied)
 
     new_ids = result.get("applied_ids", [])
     entries = result.get("report_entries", [])
 
-    # Update and save state
+    sent_count = 0
+    for entry in entries:
+        email = entry.get("recipient_email")
+        if email and re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            subject = f"Application for {entry['title']} – Amrit Raju"
+            try:
+                send_email(gmail, email, subject, entry["cover_letter"])
+                entry["sent"] = True
+                sent_count += 1
+                print(f"  Sent → {entry['company']} ({email})", flush=True)
+            except Exception as exc:
+                entry["sent"] = False
+                print(f"  Failed to send to {email}: {exc}", flush=True)
+        else:
+            entry["sent"] = False
+
     state["applied_ids"] = list(set(already_applied + new_ids))
     save_state(state)
 
-    # Write report
     date_str = datetime.now().strftime("%Y-%m-%d")
     write_report(entries, date_str)
 
-    # Print summary
-    drafts = sum(1 for e in entries if e.get("draft_created"))
-    manual = len(entries) - drafts
+    manual = len(entries) - sent_count
     print(f"\nDone!")
     print(f"  Jobs processed : {len(entries)}")
-    print(f"  Gmail drafts   : {drafts}  (review & send from Gmail Drafts)")
-    print(f"  Manual apply   : {manual}  (apply links saved in report)")
+    print(f"  Emails sent    : {sent_count}")
+    print(f"  Manual apply   : {manual}  (links in report)")
     print(f"  Report saved   : {REPORT_FILE}")
-    print(f"  State saved    : {STATE_FILE}")
 
 
 if __name__ == "__main__":
