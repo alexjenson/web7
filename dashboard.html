@@ -79,6 +79,31 @@ body#dashboard-page {
    font-size: 1.3rem;
    color: #d0d0d0;
 }
+.profile-links {
+   display: flex;
+   gap: 1rem;
+   margin-top: 1rem;
+   flex-wrap: wrap;
+}
+.profile-site-btn {
+   display: inline-flex;
+   align-items: center;
+   gap: 0.5rem;
+   background: rgba(255,255,255,0.05);
+   border: 1px solid rgba(255,255,255,0.12);
+   border-radius: 20px;
+   padding: 0.45rem 1.3rem;
+   font-family: "poppins-regular", sans-serif;
+   font-size: 1.2rem;
+   color: #bbb;
+   text-decoration: none;
+   transition: all 0.2s;
+}
+.profile-site-btn:hover {
+   background: rgba(255,0,119,0.12);
+   border-color: rgba(255,0,119,0.4);
+   color: #FF0077;
+}
 
 /* ---- Section headings ---- */
 .db-h2 {
@@ -913,6 +938,10 @@ body#dashboard-page {
             <div class="avatar">AR</div>
             <span>Amrit Raju &nbsp;·&nbsp; UI/UX &amp; Graphic Designer &nbsp;·&nbsp; Athens, Greece</span>
          </div>
+         <div class="profile-links">
+            <a href="index.html" class="profile-site-btn" target="_blank"><i class="fa fa-globe"></i> amritraju.com</a>
+            <a href="https://www.behance.net/GraphicDesign1" class="profile-site-btn" target="_blank" rel="noopener"><i class="fab fa-behance"></i> Behance Portfolio</a>
+         </div>
       </div>
    </div>
 </div>
@@ -1073,7 +1102,7 @@ body#dashboard-page {
                <span class="refresh-dot"></span>
                <span id="batch-label">Batch 1 of 2</span>
                <span class="refresh-sep">·</span>
-               <span id="refresh-status">Next refresh in: <strong id="refresh-countdown">30:00</strong></span>
+               <span id="refresh-status">Next refresh in: <strong id="refresh-countdown">20:00</strong></span>
             </div>
             <button class="refresh-btn" onclick="refreshJobsNow()">
                <i class="fa fa-sync-alt" id="refresh-icon"></i> Refresh Now
@@ -2117,7 +2146,7 @@ function renderSkillGaps() {
 
 // ── Job Refresh State ─────────────────────────────────────
 let jobBatch = 0;              // 0 = original, 1 = fresh
-let refreshSecondsLeft = 1800; // 30 minutes in seconds
+let refreshSecondsLeft = 1200; // 20 minutes in seconds
 let refreshTimerInterval = null;
 
 const JOB_BATCHES = [JOB_MATCHES, FRESH_JOBS, EU_JOBS];
@@ -2180,7 +2209,7 @@ function startRefreshTimer() {
 
 function refreshJobsNow() {
    jobBatch = (jobBatch + 1) % JOB_BATCHES.length;
-   refreshSecondsLeft = 1800;
+   refreshSecondsLeft = 1200;
    renderJobs();
    updateRefreshBar();
 
