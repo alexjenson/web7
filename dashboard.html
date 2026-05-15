@@ -367,6 +367,86 @@ body#dashboard-page {
    font-size: 1.1rem;
 }
 
+/* ---- Job Refresh Bar ---- */
+.refresh-bar {
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+   background: rgba(255,0,119,0.06);
+   border: 1px solid rgba(255,0,119,0.2);
+   border-radius: 6px;
+   padding: 0.9rem 1.4rem;
+   margin-bottom: 1.8rem;
+   font-family: "poppins-regular", sans-serif;
+   font-size: 1.25rem;
+}
+.refresh-left {
+   display: flex;
+   align-items: center;
+   gap: 0.8rem;
+   color: #888;
+}
+.refresh-dot {
+   width: 8px; height: 8px;
+   border-radius: 50%;
+   background: #4caf50;
+   animation: pulse-dot 2s infinite;
+   flex-shrink: 0;
+}
+.refresh-dot.stale { background: #ff9800; animation: none; }
+@keyframes pulse-dot {
+   0%, 100% { opacity: 1; }
+   50% { opacity: 0.3; }
+}
+#batch-label { color: #fff; font-family: "poppins-semibold", sans-serif; }
+.refresh-sep { color: #333; }
+#refresh-countdown { color: #FF0077; }
+.refresh-btn {
+   background: transparent;
+   border: 1px solid #FF0077;
+   color: #FF0077;
+   font-family: "poppins-regular", sans-serif;
+   font-size: 1.2rem;
+   padding: 0.5rem 1.2rem;
+   border-radius: 4px;
+   cursor: pointer;
+   transition: all 0.2s;
+}
+.refresh-btn:hover { background: #FF0077; color: #fff; }
+.refresh-btn .fa-sync-alt { transition: transform 0.5s; }
+.refresh-btn.spinning .fa-sync-alt { animation: spin 0.5s linear; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---- CEO contact badge ---- */
+.ceo-badge {
+   display: inline-flex;
+   align-items: center;
+   gap: 0.4rem;
+   background: rgba(255,0,119,0.12);
+   border: 1px solid rgba(255,0,119,0.3);
+   color: #FF0077;
+   font-size: 1.05rem;
+   padding: 0.2rem 0.7rem;
+   border-radius: 3px;
+   margin-top: 0.6rem;
+}
+.ceo-badge i { font-size: 0.9rem; }
+.c-links { margin-top: 0.8rem; display: flex; gap: 0.8rem; flex-wrap: wrap; }
+.c-link-btn {
+   display: inline-flex;
+   align-items: center;
+   gap: 0.4rem;
+   font-size: 1.1rem;
+   padding: 0.3rem 0.8rem;
+   border-radius: 4px;
+   text-decoration: none;
+   transition: opacity 0.2s;
+   font-family: "poppins-regular", sans-serif;
+}
+.c-link-btn:hover { opacity: 0.8; }
+.c-link-linkedin { background: rgba(0,119,181,0.15); color: #0a66c2; border: 1px solid rgba(10,102,194,0.3); }
+.c-link-email { background: rgba(76,175,80,0.1); color: #4caf50; border: 1px solid rgba(76,175,80,0.3); }
+
 /* ---- Kanban ---- */
 .kanban-board {
    display: flex;
@@ -988,6 +1068,18 @@ body#dashboard-page {
          <h2 class="db-h2">Job <span>Matches</span></h2>
          <p class="db-sub">Real opportunities from Indeed — ranked by AI fit score against your resume · Athens + Remote</p>
 
+         <div class="refresh-bar">
+            <div class="refresh-left">
+               <span class="refresh-dot"></span>
+               <span id="batch-label">Batch 1 of 2</span>
+               <span class="refresh-sep">·</span>
+               <span id="refresh-status">Next refresh in: <strong id="refresh-countdown">30:00</strong></span>
+            </div>
+            <button class="refresh-btn" onclick="refreshJobsNow()">
+               <i class="fa fa-sync-alt" id="refresh-icon"></i> Refresh Now
+            </button>
+         </div>
+
          <div class="db-table-wrap">
             <table class="db-table">
                <thead>
@@ -1374,6 +1466,117 @@ const JOB_MATCHES = [
 ];
 
 // ============================================================
+// FRESH JOBS — second batch loaded on auto-refresh
+// ============================================================
+
+const FRESH_JOBS = [
+   {
+      matchPct: 88,
+      company: 'Gravity Well Studio (Remote)',
+      role: 'UI/UX Artist',
+      salary: '$110,000 – $135,000 / yr',
+      location: 'Remote 🌍',
+      type: 'full-time',
+      missingSkills: ['Game UI Experience'],
+      requiredSkills: ['UI/UX','Figma','Game UI','Motion Design'],
+      priority: 'hot',
+      url: 'https://to.indeed.com/aaqjhwjsyhdz',
+      note: 'Premium salary — game design studio, May 15 2026'
+   },
+   {
+      matchPct: 86,
+      company: 'MaleMD (Remote)',
+      role: 'UI/UX Designer — Landing Pages',
+      salary: '$90,000 – $115,000 / yr',
+      location: 'Remote 🌍',
+      type: 'full-time',
+      missingSkills: ['Conversion Optimization'],
+      requiredSkills: ['UI/UX','Figma','Landing Pages','CRO'],
+      priority: 'hot',
+      url: 'https://to.indeed.com/aakdxjydvvcc',
+      note: 'HealthTech startup — high comp, conversion focus'
+   },
+   {
+      matchPct: 83,
+      company: 'Four Sets (Remote)',
+      role: 'Product Designer / SaaS',
+      salary: '$90,000 – $98,000 / yr',
+      location: 'Remote 🌍',
+      type: 'full-time',
+      missingSkills: ['SaaS Product Design'],
+      requiredSkills: ['UI/UX','Figma','Product Design','SaaS','User Research'],
+      priority: 'hot',
+      url: 'https://to.indeed.com/aa7nd7vkmsdm',
+      note: 'SaaS product role — design systems experience a plus'
+   },
+   {
+      matchPct: 80,
+      company: 'Ryder System (Remote)',
+      role: 'UX/UI Designer',
+      salary: '$85,000 – $94,000 / yr',
+      location: 'Remote 🌍',
+      type: 'full-time',
+      missingSkills: ['Enterprise Software UX'],
+      requiredSkills: ['UI/UX','Figma','Enterprise UX','Prototyping'],
+      priority: 'strong',
+      url: 'https://to.indeed.com/aancvhgbhy2k',
+      note: 'Fortune 500 — strong benefits package'
+   },
+   {
+      matchPct: 79,
+      company: 'Zenith Algorithms (Remote)',
+      role: 'UI/UX Figma Designer',
+      salary: '$70 – $78 / hr (contract)',
+      location: 'Remote 🌍',
+      type: 'contract',
+      missingSkills: ['Technical UX'],
+      requiredSkills: ['Figma','UI/UX','Technical Docs','Prototyping'],
+      priority: 'good',
+      url: 'https://to.indeed.com/aap9sxhp6ycr',
+      note: 'Contract — Figma expertise is core requirement'
+   },
+   {
+      matchPct: 78,
+      company: 'MDX (Remote)',
+      role: 'Creative UI/UX Designer',
+      salary: '$66,747 – $80,383 / yr',
+      location: 'Remote 🌍',
+      type: 'contract',
+      missingSkills: ['Motion Design'],
+      requiredSkills: ['UI/UX','Figma','Creative Design','Motion'],
+      priority: 'good',
+      url: 'https://to.indeed.com/aaqqxjldzkmb',
+      note: 'Contract-to-hire potential — creative focus'
+   },
+   {
+      matchPct: 76,
+      company: 'Progressive Tech Solutions (Remote)',
+      role: 'UX Designer',
+      salary: '$65 – $70 / hr (contract)',
+      location: 'Remote 🌍',
+      type: 'contract',
+      missingSkills: ['Agile / Scrum','User Testing'],
+      requiredSkills: ['UI/UX','Figma','Agile','User Research'],
+      priority: 'good',
+      url: 'https://to.indeed.com/aa6khs46m4sh',
+      note: 'IT consulting contract — enterprise UX experience'
+   },
+   {
+      matchPct: 93,
+      company: 'Domes Resorts & Reserves',
+      role: 'Web & Graphic Designer',
+      salary: 'Competitive (Athens)',
+      location: 'Athens 🇬🇷',
+      type: 'full-time',
+      missingSkills: [],
+      requiredSkills: ['Figma','Adobe Suite','UI/UX','Web Design','Branding'],
+      priority: 'hot',
+      url: 'https://to.indeed.com/aafn8zhp2hts',
+      note: 'Luxury hospitality — perfect match for multi-disciplinary profile'
+   }
+];
+
+// ============================================================
 // NETWORKING CONTACTS
 // ============================================================
 
@@ -1419,6 +1622,52 @@ const CONTACTS = [
       status: 'replied', lastContact: '2026-05-12',
       referral: true,
       notes: 'Runs Athens designers Slack group, willing to refer to clients'
+   },
+   // ── CEO / Executive Outreach ─────────────────────────────
+   {
+      initials: 'BN', name: 'Byron Nicolaides',
+      role: 'Founder & CEO', company: 'PEOPLECERT',
+      email: 'communication@peoplecert.org',
+      linkedin: 'https://linkedin.com/in/byronnicolaides',
+      status: 'cold', lastContact: null,
+      referral: false, ceo: true,
+      notes: '✓ Email verified · CEO since 2000 · Global EdTech leader. Best angle: UX impact on certification platform adoption rates.'
+   },
+   {
+      initials: 'AT', name: 'CEO / Managing Director',
+      role: 'Managing Director', company: 'ATCOM',
+      email: 'info@atcom.gr',
+      linkedin: 'https://www.linkedin.com/company/atcom/people/?keywords=CEO+Managing+Director',
+      status: 'cold', lastContact: null,
+      referral: false, ceo: true,
+      notes: '🔍 Find via LinkedIn → Largest Greek digital agency. Angle: portfolio case studies + agency UX workflow expertise.'
+   },
+   {
+      initials: 'TC', name: 'Co-founder / CEO',
+      role: 'Co-founder', company: 'techne',
+      email: 'hello@techne.gr',
+      linkedin: 'https://www.linkedin.com/company/techne-gr/people/?keywords=founder+CEO',
+      status: 'cold', lastContact: null,
+      referral: false, ceo: true,
+      notes: '🔍 Find via LinkedIn → Hospitality & Retail UX product studio. Angle: multi-industry design + hospitality portfolio pieces.'
+   },
+   {
+      initials: 'RB', name: 'Co-founder / CEO',
+      role: 'Co-founder', company: 'Reborrn',
+      email: 'hello@reborrn.com',
+      linkedin: 'https://www.linkedin.com/company/reborrn/people/?keywords=founder+CEO',
+      status: 'cold', lastContact: null,
+      referral: false, ceo: true,
+      notes: '🔍 Find via LinkedIn → Top global clients (Coca-Cola, L\'Oréal). Angle: brand + UI dual expertise and luxury work.'
+   },
+   {
+      initials: 'DR', name: 'Creative Director',
+      role: 'Head of Design', company: 'Domes Resorts & Reserves',
+      email: 'hr@domesresorts.com',
+      linkedin: 'https://www.linkedin.com/company/domes-resorts-reserves/people/?keywords=creative+design',
+      status: 'cold', lastContact: null,
+      referral: false, ceo: true,
+      notes: '🔍 Find via LinkedIn → Award-winning luxury hospitality brand. Angle: premium visual storytelling + hospitality portfolio.'
    }
 ];
 
@@ -1703,8 +1952,17 @@ function renderSkillGaps() {
 // RENDER — Job Matches
 // ============================================================
 
-function renderJobs() {
-   const sorted = [...JOB_MATCHES].sort((a,b) => b.matchPct - a.matchPct);
+// ── Job Refresh State ─────────────────────────────────────
+let jobBatch = 0;              // 0 = original, 1 = fresh
+let refreshSecondsLeft = 1800; // 30 minutes in seconds
+let refreshTimerInterval = null;
+
+const JOB_BATCHES = [JOB_MATCHES, FRESH_JOBS];
+const BATCH_NAMES = ['Batch 1 of 2 · Current Listings', 'Batch 2 of 2 · Latest Remote Jobs'];
+
+function renderJobs(batch) {
+   const data = batch !== undefined ? JOB_BATCHES[batch] : JOB_BATCHES[jobBatch];
+   const sorted = [...data].sort((a,b) => b.matchPct - a.matchPct);
    document.getElementById('jobs-tbody').innerHTML = sorted.map(j => {
       const mc = j.matchPct >= 85 ? 'm-high' : j.matchPct >= 70 ? 'm-mid' : 'm-low';
       const missing = j.missingSkills.length
@@ -1722,6 +1980,53 @@ function renderJobs() {
             <td><a href="${j.url}" target="_blank" rel="noopener" class="apply-btn">Apply</a></td>
          </tr>`;
    }).join('');
+}
+
+function fmtTime(s) {
+   const m = Math.floor(s / 60).toString().padStart(2, '0');
+   const sec = (s % 60).toString().padStart(2, '0');
+   return `${m}:${sec}`;
+}
+
+function updateRefreshBar() {
+   const cdEl = document.getElementById('refresh-countdown');
+   const labelEl = document.getElementById('batch-label');
+   const dotEl = document.querySelector('.refresh-dot');
+   if (cdEl) cdEl.textContent = fmtTime(refreshSecondsLeft);
+   if (labelEl) labelEl.textContent = BATCH_NAMES[jobBatch];
+   if (dotEl) {
+      dotEl.className = 'refresh-dot' + (refreshSecondsLeft < 60 ? ' stale' : '');
+   }
+}
+
+function startRefreshTimer() {
+   if (refreshTimerInterval) clearInterval(refreshTimerInterval);
+   refreshTimerInterval = setInterval(() => {
+      refreshSecondsLeft--;
+      if (refreshSecondsLeft <= 0) {
+         refreshJobsNow();
+      } else {
+         updateRefreshBar();
+      }
+   }, 1000);
+}
+
+function refreshJobsNow() {
+   jobBatch = (jobBatch + 1) % JOB_BATCHES.length;
+   refreshSecondsLeft = 1800;
+   renderJobs();
+   updateRefreshBar();
+
+   const statusEl = document.getElementById('refresh-status');
+   if (statusEl) {
+      statusEl.innerHTML = '✓ Jobs updated — next refresh in: <strong id="refresh-countdown">' + fmtTime(refreshSecondsLeft) + '</strong>';
+   }
+
+   const btn = document.querySelector('.refresh-btn');
+   if (btn) {
+      btn.classList.add('spinning');
+      setTimeout(() => btn.classList.remove('spinning'), 600);
+   }
 }
 
 // ============================================================
@@ -1809,16 +2114,25 @@ function saveApp() {
 // ============================================================
 
 function renderContacts() {
-   document.getElementById('contacts-grid').innerHTML = contacts.map(c => `
-      <div class="contact-card">
-         <div class="c-avatar">${c.initials}</div>
+   document.getElementById('contacts-grid').innerHTML = contacts.map(c => {
+      const ceoBadge = c.ceo ? `<span class="ceo-badge"><i class="fa fa-crown"></i> Executive Outreach</span>` : '';
+      const links = (c.linkedin || c.email) ? `<div class="c-links">
+         ${c.linkedin ? `<a href="${c.linkedin}" target="_blank" rel="noopener" class="c-link-btn c-link-linkedin"><i class="fab fa-linkedin"></i> LinkedIn</a>` : ''}
+         ${c.email ? `<a href="mailto:${c.email}" class="c-link-btn c-link-email"><i class="fa fa-envelope"></i> Email</a>` : ''}
+      </div>` : '';
+      return `
+      <div class="contact-card${c.ceo?' ceo-card':''}">
+         <div class="c-avatar" style="${c.ceo?'background:linear-gradient(135deg,#FF0077,#cc005f);':''}">${c.initials}</div>
          <div class="c-name">${c.name}</div>
          <div class="c-role">${c.role}</div>
          <div class="c-role" style="color:#444;">${c.company}</div>
-         <span class="c-status s-${c.status}">${c.status.charAt(0).toUpperCase()+c.status.slice(1)}</span>
+         ${ceoBadge}
+         <span class="c-status s-${c.status}" style="margin-top:0.6rem;">${c.status.charAt(0).toUpperCase()+c.status.slice(1)}</span>
          ${c.referral ? '<div class="c-referral"><i class="fa fa-star"></i> Referral opportunity</div>' : ''}
+         ${links}
          ${c.notes ? `<div class="c-notes">${c.notes}</div>` : ''}
-      </div>`).join('');
+      </div>`;
+   }).join('');
 }
 
 // ============================================================
@@ -2126,6 +2440,8 @@ document.addEventListener('DOMContentLoaded', function() {
    renderKeywords();
    renderSkillGaps();
    renderJobs();
+   updateRefreshBar();
+   startRefreshTimer();
    initKanban();
    renderContacts();
    renderRoadmap();
