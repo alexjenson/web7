@@ -1,0 +1,2160 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+   <script src="https://kit.fontawesome.com/853d64d35b.js" crossorigin="anonymous"></script>
+   <meta charset="utf-8">
+   <title>Career Intelligence Dashboard — Amrit Raju</title>
+   <meta name="description" content="AI-powered career intelligence dashboard for Amrit Raju">
+   <meta name="author" content="Amrit Raju">
+   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+   <link rel="stylesheet" href="css/base.css">
+   <link rel="stylesheet" href="css/main.css">
+   <link rel="stylesheet" href="css/vendor.css">
+
+   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+
+   <link rel="icon" type="image/png" href="favicon.png">
+
+   <style>
+/* =====================================================
+   CAREER DASHBOARD — Override & Extension Styles
+   ===================================================== */
+
+/* Page setup */
+body#dashboard-page {
+   padding-top: 66px;
+}
+
+/* ---- Section wrappers ---- */
+.db-section {
+   padding: 6rem 0 5rem;
+}
+.db-section-alt {
+   background: #1a1a1a;
+}
+.db-title-bar {
+   background: #000;
+   padding: 3.5rem 0 2.8rem;
+   border-bottom: 2px solid #FF0077;
+}
+.db-title-bar h1 {
+   color: #fff;
+   font-family: "poppins-semibold", sans-serif;
+   font-size: 2.8rem;
+   letter-spacing: -0.05rem;
+   margin: 0 0 0.5rem;
+}
+.db-title-bar p {
+   color: #666;
+   font-family: "poppins-regular", sans-serif;
+   font-size: 1.3rem;
+   margin: 0;
+}
+.db-title-bar .profile-pill {
+   display: inline-flex;
+   align-items: center;
+   gap: 0.8rem;
+   background: rgba(255,0,119,0.1);
+   border: 1px solid rgba(255,0,119,0.3);
+   border-radius: 20px;
+   padding: 0.5rem 1.5rem 0.5rem 0.5rem;
+   margin-top: 1.2rem;
+}
+.db-title-bar .profile-pill .avatar {
+   width: 3.2rem;
+   height: 3.2rem;
+   border-radius: 50%;
+   background: #FF0077;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   font-family: "poppins-bold", sans-serif;
+   font-size: 1.3rem;
+   color: #fff;
+}
+.db-title-bar .profile-pill span {
+   font-family: "poppins-regular", sans-serif;
+   font-size: 1.3rem;
+   color: #d0d0d0;
+}
+
+/* ---- Section headings ---- */
+.db-h2 {
+   font-family: "poppins-semibold", sans-serif;
+   color: #fff;
+   font-size: 2rem;
+   margin-bottom: 0.3rem;
+   letter-spacing: -0.03rem;
+}
+.db-h2 span { color: #FF0077; }
+.db-sub {
+   color: #666;
+   font-size: 1.35rem;
+   font-family: "poppins-regular", sans-serif;
+   margin-bottom: 3.5rem;
+}
+
+/* ---- Cards / Panels ---- */
+.db-panel {
+   background: #222;
+   border: 1px solid rgba(255,255,255,0.07);
+   border-radius: 6px;
+   padding: 2.4rem;
+   margin-bottom: 2.4rem;
+}
+.db-panel h3 {
+   font-family: "poppins-semibold", sans-serif;
+   font-size: 1.5rem;
+   color: #fff;
+   margin-bottom: 1.5rem;
+   padding-bottom: 1.2rem;
+   border-bottom: 1px solid rgba(255,255,255,0.07);
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+}
+.panel-badge {
+   font-size: 1.1rem;
+   font-family: "poppins-bold", sans-serif;
+   background: #FF0077;
+   color: #fff;
+   padding: 0.2rem 0.9rem;
+   border-radius: 10px;
+   float: none;
+}
+
+/* ---- KPI Cards ---- */
+.kpi-grid {
+   display: flex;
+   gap: 1.5rem;
+   flex-wrap: wrap;
+   margin-bottom: 3rem;
+}
+.kpi-card {
+   flex: 1;
+   min-width: 160px;
+   background: #222;
+   border: 1px solid rgba(255,0,119,0.18);
+   border-radius: 6px;
+   padding: 2.2rem 2rem;
+   text-align: center;
+   transition: border-color 0.25s;
+}
+.kpi-card:hover { border-color: #FF0077; }
+.kpi-icon {
+   font-size: 2.2rem;
+   color: #FF0077;
+   margin-bottom: 1rem;
+}
+.kpi-value {
+   font-family: "poppins-bold", sans-serif;
+   font-size: 3.4rem;
+   color: #fff;
+   line-height: 1;
+   margin-bottom: 0.5rem;
+}
+.kpi-value small { font-size: 1.8rem; }
+.kpi-label {
+   font-family: "poppins-regular", sans-serif;
+   font-size: 1.1rem;
+   color: #666;
+   text-transform: uppercase;
+   letter-spacing: 0.12rem;
+}
+.kpi-trend {
+   font-size: 1.1rem;
+   margin-top: 0.7rem;
+   font-family: "poppins-regular", sans-serif;
+}
+.kpi-trend.up { color: #4caf50; }
+.kpi-trend.neutral { color: #666; }
+.kpi-trend.warn { color: #ff9800; }
+
+/* ---- ATS Gauge ---- */
+.ats-gauge-wrap {
+   max-width: 240px;
+   margin: 0 auto 1.5rem;
+   position: relative;
+}
+.ats-score-label {
+   position: absolute;
+   top: 62%;
+   left: 50%;
+   transform: translate(-50%, -50%);
+   text-align: center;
+   pointer-events: none;
+}
+.ats-score-label .score-num {
+   display: block;
+   font-family: "poppins-bold", sans-serif;
+   font-size: 3.6rem;
+   color: #fff;
+   line-height: 1;
+}
+.ats-score-label .score-grade {
+   font-size: 1.2rem;
+   color: #FF0077;
+   font-family: "poppins-semibold", sans-serif;
+}
+
+/* ---- Keyword pills ---- */
+.keyword-grid {
+   display: flex;
+   flex-wrap: wrap;
+   gap: 0.7rem;
+   margin-top: 1.2rem;
+}
+.kw-pill {
+   font-family: "poppins-regular", sans-serif;
+   font-size: 1.2rem;
+   padding: 0.45rem 1.1rem;
+   border-radius: 20px;
+   color: #fff;
+}
+.kw-high    { background: #FF0077; }
+.kw-medium  { background: rgba(255,0,119,0.55); }
+.kw-low     { background: #3a3a3a; color: #aaa; }
+.kw-missing { background: transparent; border: 1px dashed #444; color: #666; }
+
+/* ---- Skill gap bars ---- */
+.skill-gap-item { margin-bottom: 1.8rem; }
+.skill-gap-item .sg-name {
+   font-family: "poppins-semibold", sans-serif;
+   font-size: 1.3rem;
+   color: #d0d0d0;
+   display: flex;
+   justify-content: space-between;
+   margin-bottom: 0.5rem;
+}
+.sg-pct { color: #FF0077; }
+.sg-track {
+   height: 5px;
+   background: #2e2e2e;
+   border-radius: 3px;
+   overflow: hidden;
+}
+.sg-fill {
+   height: 100%;
+   border-radius: 3px;
+   background: #FF0077;
+   transition: width 1.2s ease;
+}
+.sg-fill.gap-fill { background: #444; }
+.sg-note {
+   font-size: 1.1rem;
+   margin-top: 0.3rem;
+   font-family: "poppins-regular", sans-serif;
+}
+.sg-note.ok   { color: #4caf50; }
+.sg-note.warn { color: #ff9800; }
+
+/* ---- Salary range ---- */
+.salary-cards {
+   display: flex;
+   gap: 1rem;
+   margin-bottom: 1rem;
+}
+.salary-card {
+   flex: 1;
+   background: rgba(76,175,80,0.08);
+   border: 1px solid rgba(76,175,80,0.2);
+   border-radius: 4px;
+   padding: 1.2rem;
+   text-align: center;
+}
+.salary-card.highlight {
+   border-color: rgba(255,0,119,0.4);
+   background: rgba(255,0,119,0.06);
+}
+.sc-label {
+   color: #666;
+   font-size: 1.1rem;
+   font-family: "poppins-regular", sans-serif;
+   text-transform: uppercase;
+   letter-spacing: 0.1rem;
+}
+.sc-value {
+   color: #4caf50;
+   font-family: "poppins-bold", sans-serif;
+   font-size: 2rem;
+   display: block;
+   margin-top: 0.3rem;
+}
+.salary-card.highlight .sc-value { color: #FF0077; }
+.sc-sub {
+   color: #444;
+   font-size: 1rem;
+   display: block;
+   margin-top: 0.2rem;
+}
+
+/* ---- Job Matches table ---- */
+.db-table-wrap { overflow-x: auto; }
+.db-table {
+   width: 100%;
+   border-collapse: collapse;
+   font-family: "poppins-regular", sans-serif;
+   font-size: 1.3rem;
+}
+.db-table th {
+   background: #1a1a1a;
+   color: #FF0077;
+   font-family: "poppins-semibold", sans-serif;
+   font-size: 1.05rem;
+   text-transform: uppercase;
+   letter-spacing: 0.09rem;
+   padding: 1.2rem 1.4rem;
+   border-bottom: 2px solid rgba(255,0,119,0.25);
+   white-space: nowrap;
+   text-align: left;
+}
+.db-table td {
+   padding: 1.4rem;
+   border-bottom: 1px solid rgba(255,255,255,0.05);
+   color: #d0d0d0;
+   vertical-align: middle;
+}
+.db-table tr:hover td { background: rgba(255,0,119,0.03); }
+.match-pct {
+   font-family: "poppins-bold", sans-serif;
+   font-size: 1.5rem;
+}
+.m-high   { color: #4caf50; }
+.m-mid    { color: #ff9800; }
+.m-low    { color: #666; }
+.prio-badge {
+   display: inline-block;
+   padding: 0.25rem 0.8rem;
+   border-radius: 3px;
+   font-size: 1rem;
+   font-family: "poppins-bold", sans-serif;
+   text-transform: uppercase;
+   letter-spacing: 0.08rem;
+   white-space: nowrap;
+}
+.b-hot    { background: #FF0077; color: #fff; }
+.b-strong { background: #7a003b; color: #ffaacc; }
+.b-good   { background: #2a2a2a; color: #888; border: 1px solid #444; }
+.b-remote { background: rgba(33,150,243,0.2); color: #64b5f6; }
+.apply-btn {
+   display: inline-block;
+   background: #FF0077;
+   color: #fff !important;
+   font-family: "poppins-bold", sans-serif;
+   font-size: 1.1rem;
+   padding: 0.6rem 1.3rem;
+   border-radius: 3px;
+   text-decoration: none;
+   text-transform: uppercase;
+   letter-spacing: 0.08rem;
+   white-space: nowrap;
+   transition: background 0.2s;
+}
+.apply-btn:hover { background: #cc005f; }
+.missing-tag {
+   display: inline-block;
+   color: #ff9800;
+   font-size: 1.1rem;
+   background: rgba(255,152,0,0.1);
+   border-radius: 3px;
+   padding: 0.2rem 0.6rem;
+   margin: 0.15rem;
+}
+.have-tag {
+   color: #4caf50;
+   font-size: 1.1rem;
+}
+
+/* ---- Kanban ---- */
+.kanban-board {
+   display: flex;
+   gap: 1.6rem;
+   overflow-x: auto;
+   padding-bottom: 1.2rem;
+}
+.kanban-col {
+   flex: 0 0 240px;
+   background: #1e1e1e;
+   border-radius: 6px;
+   border-top: 3px solid #FF0077;
+   padding: 1.4rem;
+   min-height: 280px;
+}
+.kanban-col.col-screening { border-top-color: #ff9800; }
+.kanban-col.col-interview  { border-top-color: #2196f3; }
+.kanban-col.col-offer      { border-top-color: #4caf50; }
+.kanban-col.col-rejected   { border-top-color: #3a3a3a; }
+.kanban-col-hdr {
+   font-family: "poppins-semibold", sans-serif;
+   font-size: 1.2rem;
+   color: #fff;
+   text-transform: uppercase;
+   letter-spacing: 0.12rem;
+   margin-bottom: 1.2rem;
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+}
+.k-count {
+   background: rgba(255,255,255,0.08);
+   color: #666;
+   font-size: 1rem;
+   padding: 0.15rem 0.6rem;
+   border-radius: 9px;
+}
+.k-cards { min-height: 40px; }
+.k-card {
+   background: #2a2a2a;
+   border: 1px solid rgba(255,255,255,0.07);
+   border-radius: 4px;
+   padding: 1.1rem;
+   margin-bottom: 0.8rem;
+   cursor: grab;
+   transition: border-color 0.2s, box-shadow 0.2s;
+}
+.k-card:active { cursor: grabbing; }
+.k-card:hover {
+   border-color: rgba(255,0,119,0.35);
+   box-shadow: 0 2px 10px rgba(255,0,119,0.08);
+}
+.k-card.sortable-ghost { opacity: 0.35; border-color: #FF0077; }
+.k-co {
+   font-family: "poppins-bold", sans-serif;
+   color: #fff;
+   font-size: 1.35rem;
+}
+.k-role {
+   color: #666;
+   font-size: 1.2rem;
+   margin: 0.25rem 0 0.7rem;
+}
+.k-meta {
+   display: flex;
+   gap: 0.8rem;
+   font-size: 1.1rem;
+   color: #555;
+   flex-wrap: wrap;
+}
+.k-date { color: #444; font-size: 1.1rem; margin-top: 0.5rem; }
+.k-add-btn {
+   width: 100%;
+   background: transparent;
+   border: 1px dashed #333;
+   color: #555;
+   padding: 0.8rem;
+   border-radius: 4px;
+   font-size: 1.2rem;
+   cursor: pointer;
+   margin-top: 0.6rem;
+   font-family: "poppins-regular", sans-serif;
+   transition: all 0.2s;
+}
+.k-add-btn:hover { border-color: #FF0077; color: #FF0077; }
+
+/* ---- Contacts ---- */
+.contacts-grid {
+   display: flex;
+   flex-wrap: wrap;
+   gap: 1.5rem;
+}
+.contact-card {
+   flex: 0 0 calc(25% - 1.5rem);
+   min-width: 200px;
+   background: #222;
+   border: 1px solid rgba(255,255,255,0.07);
+   border-radius: 6px;
+   padding: 2rem;
+}
+.c-avatar {
+   width: 4.8rem;
+   height: 4.8rem;
+   border-radius: 50%;
+   background: #2a2a2a;
+   border: 2px solid rgba(255,0,119,0.3);
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   font-family: "poppins-bold", sans-serif;
+   font-size: 1.6rem;
+   color: #FF0077;
+   margin-bottom: 1.2rem;
+}
+.c-name {
+   font-family: "poppins-semibold", sans-serif;
+   color: #fff;
+   font-size: 1.4rem;
+   margin-bottom: 0.2rem;
+}
+.c-role {
+   color: #666;
+   font-size: 1.2rem;
+   font-family: "poppins-regular", sans-serif;
+}
+.c-status {
+   display: inline-block;
+   margin-top: 1rem;
+   padding: 0.25rem 0.9rem;
+   border-radius: 3px;
+   font-size: 1.05rem;
+   font-family: "poppins-bold", sans-serif;
+   text-transform: uppercase;
+   letter-spacing: 0.08rem;
+}
+.s-replied    { background: rgba(76,175,80,0.15);   color: #4caf50; }
+.s-contacted  { background: rgba(33,150,243,0.15);  color: #64b5f6; }
+.s-pending    { background: rgba(255,152,0,0.15);   color: #ff9800; }
+.s-cold       { background: rgba(100,100,100,0.12); color: #666; }
+.c-referral {
+   margin-top: 0.7rem;
+   color: #ff9800;
+   font-size: 1.1rem;
+}
+.c-notes {
+   margin-top: 1rem;
+   padding-top: 0.8rem;
+   border-top: 1px solid rgba(255,255,255,0.05);
+   color: #555;
+   font-size: 1.2rem;
+   font-family: "lora-regular", serif;
+   line-height: 2rem;
+}
+
+/* ---- Roadmap ---- */
+.roadmap-timeline {
+   position: relative;
+   padding-left: 3rem;
+}
+.roadmap-timeline::before {
+   content: "";
+   position: absolute;
+   left: 0.85rem;
+   top: 0.3rem;
+   bottom: 0.3rem;
+   width: 2px;
+   background: rgba(255,0,119,0.18);
+}
+.rm-item {
+   position: relative;
+   background: #1e1e1e;
+   border-radius: 4px;
+   padding: 1.4rem 1.6rem;
+   margin-bottom: 1.5rem;
+}
+.rm-item::before {
+   content: "";
+   position: absolute;
+   left: -2.5rem;
+   top: 1.6rem;
+   width: 1.1rem;
+   height: 1.1rem;
+   border-radius: 50%;
+   background: #FF0077;
+   border: 2px solid #151515;
+}
+.rm-item.done::before       { background: #4caf50; }
+.rm-item.in-progress::before { background: #ff9800; }
+.rm-item.future::before      { background: #333; }
+.rm-h4 {
+   font-family: "poppins-semibold", sans-serif;
+   color: #fff;
+   font-size: 1.35rem;
+   margin-bottom: 0.3rem;
+}
+.rm-meta {
+   color: #666;
+   font-size: 1.2rem;
+   font-family: "poppins-regular", sans-serif;
+}
+.rm-reason {
+   color: #444;
+   font-size: 1.1rem;
+   font-family: "poppins-regular", sans-serif;
+   margin-top: 0.3rem;
+}
+.rm-tag {
+   display: inline-block;
+   margin-top: 0.7rem;
+   padding: 0.2rem 0.8rem;
+   border-radius: 3px;
+   font-size: 1rem;
+   font-family: "poppins-bold", sans-serif;
+   text-transform: uppercase;
+   letter-spacing: 0.08rem;
+}
+.rt-now  { background: #FF0077; color: #fff; }
+.rt-next { background: #2a2a2a; color: #666; border: 1px solid #333; }
+.rt-done { background: rgba(76,175,80,0.15); color: #4caf50; }
+.rt-fut  { background: transparent; color: #444; border: 1px dashed #333; }
+
+/* ---- Interview Prep ---- */
+.q-card {
+   background: #1e1e1e;
+   border: 1px solid rgba(255,255,255,0.06);
+   border-radius: 4px;
+   padding: 1.5rem;
+   margin-bottom: 1.2rem;
+}
+.q-cat {
+   font-size: 1rem;
+   font-family: "poppins-bold", sans-serif;
+   text-transform: uppercase;
+   letter-spacing: 0.12rem;
+   color: #FF0077;
+   margin-bottom: 0.6rem;
+}
+.q-text {
+   color: #d0d0d0;
+   font-size: 1.4rem;
+   line-height: 2.2rem;
+   font-family: "lora-regular", serif;
+   margin: 0 0 0.8rem;
+}
+.star-block {
+   background: #151515;
+   border-left: 3px solid #FF0077;
+   padding: 1.2rem 1.5rem;
+   font-size: 1.3rem;
+   color: #555;
+   line-height: 2.4rem;
+   font-family: "lora-regular", serif;
+}
+.star-block strong {
+   color: #FF0077;
+   font-family: "poppins-bold", sans-serif;
+}
+
+/* ---- Outreach Generator ---- */
+.tmpl-tabs {
+   display: flex;
+   gap: 1rem;
+   flex-wrap: wrap;
+   margin-bottom: 2rem;
+}
+.tmpl-tab {
+   padding: 0.75rem 1.8rem;
+   border: 1px solid #333;
+   background: transparent;
+   color: #666;
+   font-family: "poppins-regular", sans-serif;
+   font-size: 1.3rem;
+   border-radius: 3px;
+   cursor: pointer;
+   transition: all 0.2s;
+}
+.tmpl-tab.active, .tmpl-tab:hover {
+   border-color: #FF0077;
+   color: #FF0077;
+}
+.tmpl-subject {
+   background: #1a1a1a;
+   padding: 1rem 1.5rem;
+   margin-bottom: 1rem;
+   font-family: "poppins-semibold", sans-serif;
+   color: #888;
+   font-size: 1.3rem;
+   border-radius: 3px;
+}
+.tmpl-body {
+   background: #1a1a1a;
+   border: 1px solid rgba(255,255,255,0.07);
+   border-radius: 4px;
+   padding: 2rem;
+   font-family: "lora-regular", serif;
+   font-size: 1.4rem;
+   color: #d0d0d0;
+   line-height: 2.6rem;
+   white-space: pre-wrap;
+   min-height: 180px;
+}
+.ph-field {
+   background: rgba(255,0,119,0.12);
+   color: #FF0077;
+   padding: 0 0.4rem;
+   border-radius: 2px;
+   font-style: italic;
+}
+.pz-grid {
+   display: grid;
+   grid-template-columns: 1fr 1fr;
+   gap: 1.2rem;
+   margin-top: 1.5rem;
+}
+.pz-grid label {
+   font-family: "poppins-bold", sans-serif;
+   font-size: 1.1rem;
+   color: #555;
+   text-transform: uppercase;
+   letter-spacing: 0.09rem;
+   display: block;
+   margin-bottom: 0.3rem;
+}
+.pz-grid input {
+   width: 100%;
+   background: #1e1e1e;
+   border: 1px solid rgba(255,255,255,0.08);
+   border-radius: 3px;
+   padding: 0.8rem 1rem;
+   color: #fff;
+   font-family: "poppins-regular", sans-serif;
+   font-size: 1.3rem;
+   box-sizing: border-box;
+}
+.pz-grid input:focus { border-color: #FF0077; outline: none; }
+.db-btn-primary {
+   background: #FF0077;
+   color: #fff;
+   border: none;
+   padding: 1rem 2.2rem;
+   font-family: "poppins-bold", sans-serif;
+   font-size: 1.3rem;
+   border-radius: 3px;
+   cursor: pointer;
+   text-transform: uppercase;
+   letter-spacing: 0.09rem;
+   transition: background 0.2s;
+}
+.db-btn-primary:hover { background: #cc005f; }
+.db-btn-ghost {
+   background: transparent;
+   color: #888;
+   border: 1px solid #444;
+   padding: 1rem 2rem;
+   font-family: "poppins-regular", sans-serif;
+   font-size: 1.3rem;
+   border-radius: 3px;
+   cursor: pointer;
+   transition: all 0.2s;
+}
+.db-btn-ghost:hover { border-color: #888; color: #fff; }
+
+/* ---- Modal ---- */
+.db-modal-overlay {
+   display: none;
+   position: fixed;
+   inset: 0;
+   background: rgba(0,0,0,0.82);
+   z-index: 9999;
+   align-items: center;
+   justify-content: center;
+}
+.db-modal-overlay.open { display: flex; }
+.db-modal {
+   background: #222;
+   border: 1px solid rgba(255,0,119,0.25);
+   border-radius: 6px;
+   padding: 3rem;
+   width: 92%;
+   max-width: 460px;
+}
+.db-modal h3 {
+   color: #fff;
+   font-family: "poppins-semibold", sans-serif;
+   font-size: 1.8rem;
+   margin-bottom: 2rem;
+}
+.db-modal input,
+.db-modal select {
+   width: 100%;
+   background: #1a1a1a;
+   border: 1px solid rgba(255,255,255,0.09);
+   border-radius: 3px;
+   padding: 1rem 1.2rem;
+   color: #fff;
+   font-size: 1.4rem;
+   margin-bottom: 1.2rem;
+   box-sizing: border-box;
+   font-family: "poppins-regular", sans-serif;
+}
+.db-modal input:focus,
+.db-modal select:focus { border-color: #FF0077; outline: none; }
+.db-modal select option { background: #222; }
+.db-modal-actions {
+   display: flex;
+   gap: 1rem;
+   justify-content: flex-end;
+   margin-top: 0.8rem;
+}
+
+/* ---- Responsive ---- */
+@media only screen and (max-width: 768px) {
+   .kanban-board { flex-direction: column; }
+   .kanban-col   { flex: none; width: 100%; }
+   .pz-grid      { grid-template-columns: 1fr; }
+   .contact-card { flex: 0 0 calc(50% - 1.5rem); }
+   .salary-cards { flex-direction: column; }
+   .kpi-card     { min-width: 140px; }
+}
+@media only screen and (max-width: 600px) {
+   .db-table th:nth-child(n+5),
+   .db-table td:nth-child(n+5) { display: none; }
+   .contact-card { flex: 0 0 100%; }
+}
+@media only screen and (max-width: 400px) {
+   .kpi-card { min-width: 100%; }
+   .db-h2    { font-size: 1.7rem; }
+}
+   </style>
+</head>
+
+<body id="dashboard-page">
+
+<!-- header -->
+<header>
+   <div class="row">
+      <div class="top-bar">
+         <a class="menu-toggle" href="#"><span>Menu</span></a>
+         <div class="logo">
+            <a href="index.html">Amrit</a>
+         </div>
+         <nav id="main-nav-wrap">
+            <ul class="main-navigation">
+               <li><a href="index.html#intro">Home</a></li>
+               <li><a href="index.html#about">About</a></li>
+               <li><a href="index.html#resume">Resume</a></li>
+               <li><a href="index.html#portfolio">Portfolio</a></li>
+               <li><a href="index.html#services">Services</a></li>
+               <li><a href="index.html#contact">Contact</a></li>
+               <li class="current"><a href="dashboard.html">Career IQ</a></li>
+            </ul>
+         </nav>
+      </div>
+   </div>
+</header>
+
+<!-- Title bar -->
+<div class="db-title-bar">
+   <div class="row">
+      <div class="col-twelve">
+         <h1>Career Intelligence <span style="color:#FF0077">Dashboard</span></h1>
+         <p>AI-powered resume analysis · Job matching · Application tracking · Outreach generator</p>
+         <div class="profile-pill">
+            <div class="avatar">AR</div>
+            <span>Amrit Raju &nbsp;·&nbsp; UI/UX &amp; Graphic Designer &nbsp;·&nbsp; Athens, Greece</span>
+         </div>
+      </div>
+   </div>
+</div>
+
+<!-- ===================================================
+     SECTION 1 — Overview KPIs
+     =================================================== -->
+<section id="db-overview" class="db-section">
+   <div class="row">
+      <div class="col-twelve">
+         <h2 class="db-h2">Career <span>Overview</span></h2>
+         <p class="db-sub">Live snapshot of your job search progress — updated as you track applications below</p>
+
+         <div class="kpi-grid" id="kpi-grid">
+            <div class="kpi-card">
+               <div class="kpi-icon"><i class="fa fa-paper-plane"></i></div>
+               <div class="kpi-value" id="kpi-apps">—</div>
+               <div class="kpi-label">Applications</div>
+               <div class="kpi-trend neutral" id="kpi-apps-sub">Track in Pipeline</div>
+            </div>
+            <div class="kpi-card">
+               <div class="kpi-icon"><i class="fa fa-reply-all"></i></div>
+               <div class="kpi-value" id="kpi-rate">—<small>%</small></div>
+               <div class="kpi-label">Response Rate</div>
+               <div class="kpi-trend warn" id="kpi-rate-sub">Avg market: 22%</div>
+            </div>
+            <div class="kpi-card">
+               <div class="kpi-icon"><i class="fa fa-comments"></i></div>
+               <div class="kpi-value" id="kpi-ivw">—</div>
+               <div class="kpi-label">Active Interviews</div>
+               <div class="kpi-trend neutral" id="kpi-ivw-sub">—</div>
+            </div>
+            <div class="kpi-card">
+               <div class="kpi-icon"><i class="fa fa-robot"></i></div>
+               <div class="kpi-value">74</div>
+               <div class="kpi-label">ATS Score</div>
+               <div class="kpi-trend up">Grade: Good</div>
+            </div>
+            <div class="kpi-card">
+               <div class="kpi-icon"><i class="fa fa-user-check"></i></div>
+               <div class="kpi-value">82<small>%</small></div>
+               <div class="kpi-label">Profile Strength</div>
+               <div class="kpi-trend up">Strong</div>
+            </div>
+         </div>
+
+         <!-- Overview charts -->
+         <div class="row">
+            <div class="col-six tab-full">
+               <div class="db-panel">
+                  <h3>Career Path Fit <span class="panel-badge">6 paths</span></h3>
+                  <canvas id="career-fit-canvas"></canvas>
+               </div>
+            </div>
+            <div class="col-six tab-full">
+               <div class="db-panel">
+                  <h3>ATS Keyword Coverage</h3>
+                  <canvas id="keyword-bar-canvas"></canvas>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</section>
+
+<!-- ===================================================
+     SECTION 2 — Resume Intelligence
+     =================================================== -->
+<section id="db-resume" class="db-section db-section-alt">
+   <div class="row">
+      <div class="col-twelve">
+         <h2 class="db-h2">Resume <span>Intelligence</span></h2>
+         <p class="db-sub">AI analysis of your ATS performance, skill gaps, salary positioning, and market keywords</p>
+      </div>
+   </div>
+
+   <div class="row">
+      <!-- Left: ATS gauge + breakdown -->
+      <div class="col-six tab-full">
+
+         <div class="db-panel">
+            <h3>ATS Score <span class="panel-badge">74 / 100</span></h3>
+            <div class="ats-gauge-wrap">
+               <canvas id="ats-gauge-canvas" height="120"></canvas>
+               <div class="ats-score-label">
+                  <span class="score-num">74</span>
+                  <span class="score-grade">Good</span>
+               </div>
+            </div>
+            <canvas id="ats-breakdown-canvas" style="margin-top:1.5rem;"></canvas>
+         </div>
+
+         <div class="db-panel">
+            <h3>Salary Potential — Greece Market</h3>
+            <div class="salary-cards">
+               <div class="salary-card">
+                  <div class="sc-label">Minimum</div>
+                  <span class="sc-value">€28K</span>
+                  <span class="sc-sub">Entry/junior Athens</span>
+               </div>
+               <div class="salary-card highlight">
+                  <div class="sc-label">Target</div>
+                  <span class="sc-value">€38–45K</span>
+                  <span class="sc-sub">Mid-senior Athens</span>
+               </div>
+               <div class="salary-card">
+                  <div class="sc-label">Remote EU</div>
+                  <span class="sc-value">€55–75K</span>
+                  <span class="sc-sub">International remote</span>
+               </div>
+            </div>
+            <p style="color:#444; font-size:1.2rem; font-family:'poppins-regular',sans-serif; margin:0;">
+               Based on 5 YOE · UI/UX + Branding · Indeed Greece market data
+            </p>
+         </div>
+
+      </div>
+
+      <!-- Right: Keywords + Skills + Radar -->
+      <div class="col-six tab-full">
+
+         <div class="db-panel">
+            <h3>Keyword Heatmap</h3>
+            <p style="color:#444; font-size:1.2rem; font-family:'poppins-regular',sans-serif; margin-bottom:0.5rem;">
+               <span style="color:#FF0077;">■</span> Strong &nbsp;
+               <span style="color:rgba(255,0,119,0.55);">■</span> Present &nbsp;
+               <span style="color:#666;">■</span> Weak &nbsp;
+               <span style="border:1px dashed #444; display:inline-block; padding:0 0.3rem; color:#555;">dashed</span> Missing
+            </p>
+            <div class="keyword-grid" id="keyword-grid"></div>
+         </div>
+
+         <div class="db-panel">
+            <h3>Skill Gap Analysis</h3>
+            <div id="skill-gaps-list"></div>
+         </div>
+
+         <div class="db-panel">
+            <h3>Skills Radar — Current vs. Market</h3>
+            <canvas id="radar-canvas"></canvas>
+         </div>
+
+      </div>
+   </div>
+</section>
+
+<!-- ===================================================
+     SECTION 3 — Job Matches
+     =================================================== -->
+<section id="db-jobs" class="db-section">
+   <div class="row">
+      <div class="col-twelve">
+         <h2 class="db-h2">Job <span>Matches</span></h2>
+         <p class="db-sub">Real opportunities from Indeed — ranked by AI fit score against your resume · Athens + Remote</p>
+
+         <div class="db-table-wrap">
+            <table class="db-table">
+               <thead>
+                  <tr>
+                     <th>Match</th>
+                     <th>Company</th>
+                     <th>Role</th>
+                     <th>Salary</th>
+                     <th>Location</th>
+                     <th>Missing Skills</th>
+                     <th>Priority</th>
+                     <th>Apply</th>
+                  </tr>
+               </thead>
+               <tbody id="jobs-tbody"></tbody>
+            </table>
+         </div>
+      </div>
+   </div>
+</section>
+
+<!-- ===================================================
+     SECTION 4 — Application Pipeline (Kanban)
+     =================================================== -->
+<section id="db-pipeline" class="db-section db-section-alt">
+   <div class="row">
+      <div class="col-twelve">
+         <h2 class="db-h2">Application <span>Pipeline</span></h2>
+         <p class="db-sub">Drag cards between columns to update status · Changes auto-saved in your browser</p>
+
+         <div class="kanban-board" id="kanban-board">
+
+            <div class="kanban-col col-applied" id="col-applied" data-status="applied">
+               <div class="kanban-col-hdr">Applied <span class="k-count" id="cnt-applied">0</span></div>
+               <div class="k-cards" id="cards-applied"></div>
+               <button class="k-add-btn" onclick="openModal('applied')"><i class="fa fa-plus"></i> Add</button>
+            </div>
+
+            <div class="kanban-col col-screening" id="col-screening" data-status="screening">
+               <div class="kanban-col-hdr">Screening <span class="k-count" id="cnt-screening">0</span></div>
+               <div class="k-cards" id="cards-screening"></div>
+               <button class="k-add-btn" onclick="openModal('screening')"><i class="fa fa-plus"></i> Add</button>
+            </div>
+
+            <div class="kanban-col col-interview" id="col-interview" data-status="interview">
+               <div class="kanban-col-hdr">Interview <span class="k-count" id="cnt-interview">0</span></div>
+               <div class="k-cards" id="cards-interview"></div>
+               <button class="k-add-btn" onclick="openModal('interview')"><i class="fa fa-plus"></i> Add</button>
+            </div>
+
+            <div class="kanban-col col-offer" id="col-offer" data-status="offer">
+               <div class="kanban-col-hdr">Offer <span class="k-count" id="cnt-offer">0</span></div>
+               <div class="k-cards" id="cards-offer"></div>
+               <button class="k-add-btn" onclick="openModal('offer')"><i class="fa fa-plus"></i> Add</button>
+            </div>
+
+            <div class="kanban-col col-rejected" id="col-rejected" data-status="rejected">
+               <div class="kanban-col-hdr">Rejected <span class="k-count" id="cnt-rejected">0</span></div>
+               <div class="k-cards" id="cards-rejected"></div>
+               <button class="k-add-btn" onclick="openModal('rejected')"><i class="fa fa-plus"></i> Add</button>
+            </div>
+
+         </div>
+      </div>
+   </div>
+</section>
+
+<!-- ===================================================
+     SECTION 5 — Networking Hub
+     =================================================== -->
+<section id="db-network" class="db-section">
+   <div class="row">
+      <div class="col-twelve">
+         <h2 class="db-h2">Networking <span>Hub</span></h2>
+         <p class="db-sub">Track hiring managers, referrals, and outreach status across target companies</p>
+         <div class="contacts-grid" id="contacts-grid"></div>
+      </div>
+   </div>
+</section>
+
+<!-- ===================================================
+     SECTION 6 — Career Growth Roadmap
+     =================================================== -->
+<section id="db-roadmap" class="db-section db-section-alt">
+   <div class="row">
+      <div class="col-twelve">
+         <h2 class="db-h2">Career Growth <span>Roadmap</span></h2>
+         <p class="db-sub">Prioritized skill-building path to close your gaps and maximize hiring probability</p>
+      </div>
+   </div>
+   <div class="row">
+      <div class="col-six tab-full">
+         <div class="db-panel" style="margin-bottom:0;">
+            <h3>Learning Path Timeline</h3>
+            <div class="roadmap-timeline" id="roadmap-timeline"></div>
+         </div>
+      </div>
+      <div class="col-six tab-full">
+         <div class="db-panel">
+            <h3>Recommended Certifications</h3>
+            <div id="cert-list"></div>
+         </div>
+      </div>
+   </div>
+</section>
+
+<!-- ===================================================
+     SECTION 7 — Interview Prep
+     =================================================== -->
+<section id="db-interview" class="db-section">
+   <div class="row">
+      <div class="col-twelve">
+         <h2 class="db-h2">Interview <span>Prep</span></h2>
+         <p class="db-sub">Role-specific question bank with STAR story templates pre-filled from your experience</p>
+
+         <div class="tmpl-tabs" id="interview-tabs">
+            <button class="tmpl-tab active" onclick="selectInterviewCat('Design Process',this)">Design Process</button>
+            <button class="tmpl-tab" onclick="selectInterviewCat('Portfolio',this)">Portfolio</button>
+            <button class="tmpl-tab" onclick="selectInterviewCat('Technical',this)">Technical</button>
+            <button class="tmpl-tab" onclick="selectInterviewCat('Behavioral',this)">Behavioral</button>
+         </div>
+
+         <div id="interview-list"></div>
+      </div>
+   </div>
+</section>
+
+<!-- ===================================================
+     SECTION 8 — Outreach Generator
+     =================================================== -->
+<section id="db-outreach" class="db-section db-section-alt">
+   <div class="row">
+      <div class="col-twelve">
+         <h2 class="db-h2">Outreach <span>Generator</span></h2>
+         <p class="db-sub">Personalised templates — fill in the fields to customize, then copy or send</p>
+
+         <div class="tmpl-tabs">
+            <button class="tmpl-tab active" onclick="selectTemplate('cold')">Cold Email</button>
+            <button class="tmpl-tab" onclick="selectTemplate('referral')">Referral Request</button>
+            <button class="tmpl-tab" onclick="selectTemplate('followup')">Follow-Up</button>
+            <button class="tmpl-tab" onclick="selectTemplate('linkedin')">LinkedIn Note</button>
+         </div>
+
+         <div id="tmpl-subject" class="tmpl-subject" style="display:none;"></div>
+         <div class="tmpl-body" id="tmpl-body"></div>
+
+         <div class="pz-grid">
+            <div>
+               <label>Contact Name</label>
+               <input type="text" id="pz-name"    placeholder="e.g. Maria Papadaki" oninput="renderTemplate()">
+            </div>
+            <div>
+               <label>Company</label>
+               <input type="text" id="pz-company" placeholder="e.g. ATCOM" oninput="renderTemplate()">
+            </div>
+            <div>
+               <label>Role / Position</label>
+               <input type="text" id="pz-role"    placeholder="e.g. UX/UI Designer" oninput="renderTemplate()">
+            </div>
+            <div>
+               <label>Where You Found Them</label>
+               <input type="text" id="pz-where"   placeholder="e.g. LinkedIn, design event" oninput="renderTemplate()">
+            </div>
+            <div>
+               <label>Specific Detail</label>
+               <input type="text" id="pz-detail"  placeholder="e.g. recent e-commerce redesign" oninput="renderTemplate()">
+            </div>
+            <div>
+               <label>Mutual Connection</label>
+               <input type="text" id="pz-mutual"  placeholder="e.g. Dimitris from PEOPLECERT" oninput="renderTemplate()">
+            </div>
+         </div>
+
+         <div style="margin-top:1.8rem; display:flex; gap:1rem;">
+            <button class="db-btn-primary" id="copy-btn" onclick="copyTemplate()">
+               <i class="fa fa-copy"></i> Copy to Clipboard
+            </button>
+            <button class="db-btn-ghost" onclick="clearFields()">Clear Fields</button>
+         </div>
+      </div>
+   </div>
+</section>
+
+<!-- footer -->
+<footer>
+   <div class="row">
+      <div class="col-six tab-full pull-right social">
+         <ul class="footer-social">
+            <li><a href="https://www.linkedin.com/in/amrit-raju-710a07200/"><i class="fa-brands fa-linkedin" style="font-size:30px"></i></a></li>
+            <li><a href="https://www.behance.net/GraphicDesign1"><i class="fa-brands fa-square-behance" style="font-size:30px"></i></a></li>
+            <li><a href="#"><i class="fa-brands fa-twitter" style="font-size:30px"></i></a></li>
+         </ul>
+      </div>
+      <div class="col-eight tab-full">
+         <div class="copyright">
+            <span>© Copyright 2026 </span>
+            <span>Career IQ Dashboard — <a href="index.html">Amrit Raju</a></span>
+         </div>
+      </div>
+      <div id="go-top">
+         <a title="Back to Top" href="#top"><i class="fa fa-long-arrow-up"></i></a>
+      </div>
+   </div>
+</footer>
+
+<!-- Add Application Modal -->
+<div class="db-modal-overlay" id="add-modal">
+   <div class="db-modal">
+      <h3>Add Application</h3>
+      <input type="text" id="m-company"  placeholder="Company name">
+      <input type="text" id="m-role"     placeholder="Job title / role">
+      <input type="text" id="m-salary"   placeholder="Salary / compensation (optional)">
+      <input type="text" id="m-location" placeholder="Location">
+      <input type="date" id="m-date">
+      <select id="m-status">
+         <option value="applied">Applied</option>
+         <option value="screening">Screening</option>
+         <option value="interview">Interview</option>
+         <option value="offer">Offer</option>
+         <option value="rejected">Rejected</option>
+      </select>
+      <div class="db-modal-actions">
+         <button class="db-btn-ghost" onclick="closeModal()">Cancel</button>
+         <button class="db-btn-primary" onclick="saveApp()">Save Application</button>
+      </div>
+   </div>
+</div>
+
+<div id="preloader">
+   <div id="loader"></div>
+</div>
+
+<script src="js/jquery-2.1.3.min.js"></script>
+<script src="js/plugins.js"></script>
+<script>
+// ============================================================
+// AI ANALYSIS DATA — computed from Amrit Raju's resume
+// ============================================================
+
+const ATS = {
+   overall: 74,
+   grade: 'Good',
+   breakdown: [
+      { cat: 'Keyword Density',     score: 76 },
+      { cat: 'Formatting / Layout', score: 85 },
+      { cat: 'Quantified Results',  score: 52 },
+      { cat: 'Action Verbs',        score: 80 },
+      { cat: 'Section Structure',   score: 70 },
+      { cat: 'Modern Tool Stack',   score: 60 }
+   ]
+};
+
+const KEYWORDS = {
+   high:    ['UI/UX Design','Branding','Graphic Design','Web Design','Adobe Illustrator',
+             'Photoshop','InDesign','Figma','WordPress','Canva'],
+   medium:  ['Wireframing','Prototyping','User Research','Social Media','HTML/CSS'],
+   low:     ['Typography','Colour Theory','Digital Design','SEO'],
+   missing: ['Design Systems','Accessibility (WCAG)','A/B Testing','Motion Design',
+             'Agile / Scrum','UX Writing','User Testing']
+};
+
+const SKILL_GAPS = [
+   { skill:'Web Design',              current:95, demand:90 },
+   { skill:'Branding',                current:95, demand:85 },
+   { skill:'Graphic Design',          current:90, demand:82 },
+   { skill:'UI/UX Design',            current:85, demand:92 },
+   { skill:'WordPress',               current:80, demand:72 },
+   { skill:'Figma / Prototyping',     current:70, demand:90 },
+   { skill:'Design Systems',          current:40, demand:82 },
+   { skill:'Accessibility (WCAG)',    current:30, demand:70 },
+   { skill:'User Research / Testing', current:50, demand:76 },
+   { skill:'Motion / Micro-animation',current:35, demand:60 }
+];
+
+// ============================================================
+// REAL JOB MATCHES — sourced from Indeed via MCP tools
+// ============================================================
+
+const JOB_MATCHES = [
+   {
+      matchPct: 93,
+      company: 'Domes Resorts & Reserves',
+      role: 'Web & Graphic Designer',
+      salary: 'Competitive (Athens)',
+      location: 'Athens 🇬🇷',
+      type: 'full-time',
+      missingSkills: [],
+      requiredSkills: ['Figma','Adobe Suite','UI/UX','Web Design','Branding'],
+      priority: 'hot',
+      url: 'https://to.indeed.com/aafn8zhp2hts',
+      note: 'Luxury hospitality — perfect match for multi-disciplinary profile'
+   },
+   {
+      matchPct: 89,
+      company: 'techne',
+      role: 'UI/UX Designer',
+      salary: 'Competitive + bonus',
+      location: 'Athens 🇬🇷',
+      type: 'full-time',
+      missingSkills: ['User Testing'],
+      requiredSkills: ['Figma','UI/UX','Web Design','Prototyping','User Research'],
+      priority: 'hot',
+      url: 'https://to.indeed.com/aam4scbj6v8y',
+      note: 'Hospitality & Retail digital products — 3+ YOE required'
+   },
+   {
+      matchPct: 85,
+      company: 'ATCOM',
+      role: 'UX/UI Designer',
+      salary: 'Competitive + insurance',
+      location: 'Athens 🇬🇷',
+      type: 'full-time',
+      missingSkills: ['Design Systems','Accessibility (WCAG)'],
+      requiredSkills: ['Figma','UI/UX','Design Systems','Prototyping'],
+      priority: 'strong',
+      url: 'https://to.indeed.com/aaz97v864p9s',
+      note: "Largest digital agency in Greece — strong career growth path"
+   },
+   {
+      matchPct: 80,
+      company: 'Reborrn',
+      role: 'Product Designer',
+      salary: 'Competitive + perks',
+      location: 'Athens 🇬🇷 (hybrid)',
+      type: 'full-time',
+      missingSkills: ['Design Systems','Agile / Scrum'],
+      requiredSkills: ['Figma','UI/UX','Design Systems','Agile','Prototyping'],
+      priority: 'strong',
+      url: 'https://to.indeed.com/aalbzs4427pz',
+      note: 'Top global clients (Coca-Cola, L\'Oréal) — fast-paced consultancy'
+   },
+   {
+      matchPct: 76,
+      company: 'PEOPLECERT',
+      role: 'Senior UX/UI Designer',
+      salary: 'Competitive',
+      location: 'Athens 🇬🇷',
+      type: 'full-time',
+      missingSkills: ['Design Systems','A/B Testing','Accessibility','User Research'],
+      requiredSkills: ['Figma','UI/UX','Design Systems','A/B Testing','6 YOE'],
+      priority: 'good',
+      url: 'https://to.indeed.com/aa4yjcnfjckc',
+      note: 'Global EdTech leader — 6 YOE required, gap in Design Systems'
+   },
+   {
+      matchPct: 91,
+      company: 'MarketBridge (Remote)',
+      role: 'Graphic Designer',
+      salary: '$60,000 – $70,000 / yr',
+      location: 'Remote 🌍',
+      type: 'full-time',
+      missingSkills: [],
+      requiredSkills: ['Graphic Design','Branding','Adobe Suite','Marketing'],
+      priority: 'hot',
+      url: 'https://to.indeed.com/aajlgcpww7jk',
+      note: 'Fully remote — strong match, posted May 2026'
+   },
+   {
+      matchPct: 82,
+      company: 'BJC HealthCare (Remote)',
+      role: 'Graphic Designer — Digital & Brand',
+      salary: '$72,000 – $99,000 / yr',
+      location: 'Remote 🌍',
+      type: 'full-time',
+      missingSkills: ['Healthcare domain knowledge'],
+      requiredSkills: ['Graphic Design','Branding','Digital Design','Marketing'],
+      priority: 'strong',
+      url: 'https://to.indeed.com/aavhtkpk9psb',
+      note: 'Strong salary range — healthcare sector exposure needed'
+   },
+   {
+      matchPct: 78,
+      company: 'Collier Simon (Remote)',
+      role: 'Senior Designer',
+      salary: '$75,000 – $90,000 / yr',
+      location: 'Remote 🌍',
+      type: 'full-time',
+      missingSkills: ['Motion Design'],
+      requiredSkills: ['Graphic Design','UI/UX','Branding','Motion Design'],
+      priority: 'good',
+      url: 'https://to.indeed.com/aa6c9wyqzymq',
+      note: 'Senior role — motion design gap, otherwise strong match'
+   }
+];
+
+// ============================================================
+// NETWORKING CONTACTS
+// ============================================================
+
+const CONTACTS = [
+   {
+      initials: 'GM', name: 'George Makris',
+      role: 'Creative Director', company: 'ATCOM',
+      status: 'replied', lastContact: '2026-05-10',
+      referral: true,
+      notes: 'Replied on LinkedIn, suggested applying directly to the UX/UI role'
+   },
+   {
+      initials: 'EK', name: 'Elena Kostopoulos',
+      role: 'Head of Design', company: 'Reborrn',
+      status: 'contacted', lastContact: '2026-05-08',
+      referral: true,
+      notes: 'Sent cold email — positive reply, call pending'
+   },
+   {
+      initials: 'NK', name: 'Nikos Karamanlis',
+      role: 'UX Lead', company: 'techne',
+      status: 'pending', lastContact: '2026-05-02',
+      referral: false,
+      notes: 'LinkedIn connection request sent, awaiting response'
+   },
+   {
+      initials: 'AP', name: 'Anna Papadimitriou',
+      role: 'Marketing Manager', company: 'Domes Resorts',
+      status: 'cold', lastContact: null,
+      referral: true,
+      notes: 'Identified via LinkedIn — mutual connection from Behance community'
+   },
+   {
+      initials: 'DT', name: 'Dimitris Tsakonas',
+      role: 'Product Lead', company: 'PEOPLECERT',
+      status: 'cold', lastContact: null,
+      referral: false,
+      notes: 'Head of UX team — reaches out to Behance designers periodically'
+   },
+   {
+      initials: 'SM', name: 'Sophia Mavridis',
+      role: 'Freelance Community Lead', company: 'Upwork Greece',
+      status: 'replied', lastContact: '2026-05-12',
+      referral: true,
+      notes: 'Runs Athens designers Slack group, willing to refer to clients'
+   }
+];
+
+// ============================================================
+// CAREER ROADMAP
+// ============================================================
+
+const ROADMAP = [
+   {
+      title: 'Figma Advanced — Auto Layout, Variables & Dev Mode',
+      type: 'fa-graduation-cap', platform: 'Figma Academy / YouTube',
+      duration: '2 weeks', status: 'in-progress', tag: 'rt-now',
+      tagText: 'In Progress', priority: 'High',
+      reason: 'Required in 7/8 top job listings in Athens'
+   },
+   {
+      title: 'Build a Design System (personal project)',
+      type: 'fa-layer-group', platform: 'Self-directed portfolio project',
+      duration: '3–4 weeks', status: 'next', tag: 'rt-next',
+      tagText: 'Up Next', priority: 'High',
+      reason: 'Closes largest skill gap — adds case study to portfolio'
+   },
+   {
+      title: 'WCAG 2.1 Accessibility Fundamentals',
+      type: 'fa-universal-access', platform: 'Deque University (free)',
+      duration: '1 week', status: 'next', tag: 'rt-next',
+      tagText: 'Up Next', priority: 'Medium',
+      reason: 'Required by ATCOM and EU-market remote roles'
+   },
+   {
+      title: 'Google UX Design Certificate',
+      type: 'fa-certificate', platform: 'Coursera (self-paced)',
+      duration: '3–6 months', status: 'future', tag: 'rt-fut',
+      tagText: 'Planned', priority: 'Medium',
+      reason: 'Validates UX methodology for product-side roles'
+   },
+   {
+      title: 'Add 2 quantified case studies to Behance',
+      type: 'fa-images', platform: 'behance.net/GraphicDesign1',
+      duration: '4 weeks', status: 'in-progress', tag: 'rt-now',
+      tagText: 'In Progress', priority: 'High',
+      reason: 'Raises ATS score by ~12 pts — top recruiter ask'
+   },
+   {
+      title: 'Motion Design with After Effects / Lottie',
+      type: 'fa-film', platform: 'School of Motion',
+      duration: '4–6 weeks', status: 'future', tag: 'rt-fut',
+      tagText: 'Future', priority: 'Low',
+      reason: 'Differentiator for senior art director / creative roles'
+   }
+];
+
+const CERTS = [
+   { name:'Google UX Design Certificate', platform:'Coursera', cost:'~$240 (7 courses)', duration:'3–6 mo', priority:'High' },
+   { name:'Interaction Design Foundation', platform:'IxDF', cost:'$144/yr', duration:'Ongoing', priority:'High' },
+   { name:'Figma Advanced Certification',  platform:'Figma Academy', cost:'Free', duration:'2–3 wks', priority:'High' },
+   { name:'Deque WCAG Accessibility',      platform:'Deque University', cost:'Free', duration:'1 wk', priority:'Medium' },
+   { name:'Design Thinking Certification', platform:'IDEO / Coursera', cost:'~$180', duration:'4 wks', priority:'Medium' },
+   { name:'Meta Social Media Marketing',   platform:'Coursera / Meta', cost:'~$200', duration:'7 mo', priority:'Low' }
+];
+
+// ============================================================
+// INTERVIEW QUESTIONS
+// ============================================================
+
+const INTERVIEW_QS = {
+   'Design Process': [
+      {
+         q: 'Walk me through your design process from brief to final delivery.',
+         star: {
+            s: 'At Darkhorse, a sports app needed a full redesign after a 3.2-star average review.',
+            t: 'I owned end-to-end product design — research, wireframes, UI, and developer handoff.',
+            a: 'Ran 5 user interviews, built 3 journey maps, delivered 4 rounds of hi-fi iterations in Figma.',
+            r: 'App Store rating improved to 4.6 stars within 3 months of launch.'
+         }
+      },
+      {
+         q: 'How do you handle conflicting feedback from stakeholders and users?',
+         star: {
+            s: 'At BillonAble, the product manager and a key client had opposing opinions on a dashboard layout.',
+            t: 'I needed to align both stakeholders without delaying the sprint.',
+            a: 'Facilitated a 30-min review session with prototype, showed data on task completion time for each variant.',
+            r: 'Both agreed on the data-backed solution — zero delay, shipped on schedule.'
+         }
+      }
+   ],
+   'Portfolio': [
+      {
+         q: 'Tell me about your most challenging project and how you overcame obstacles.',
+         star: {
+            s: 'At BillonAble, I was managing 8 multinational brand campaigns simultaneously with inconsistent identities.',
+            t: 'Standardise the visual language across all campaigns without disrupting live projects.',
+            a: 'Created a shared component library in Illustrator; ran brand workshops with each client team.',
+            r: 'Reduced revision cycles by 40% — won internal client satisfaction award.'
+         }
+      },
+      {
+         q: 'How do you measure whether your designs were successful?',
+         star: null,
+         hint: 'Tip: reference app store ratings, NPS scores, bounce rates, time-on-task, or client KPIs you tracked.'
+      }
+   ],
+   'Technical': [
+      {
+         q: 'What is your Figma workflow for handing off designs to developers?',
+         star: null,
+         hint: 'Cover: naming conventions, component structure, auto-layout, Dev Mode exports, annotation, and your handoff checklist.'
+      },
+      {
+         q: 'How do you ensure your designs are accessible to users with disabilities?',
+         star: null,
+         hint: 'Mention: WCAG 2.1 contrast ratios (4.5:1 minimum), focus states, alt text, keyboard navigation, and tools like Stark plugin in Figma.'
+      }
+   ],
+   'Behavioral': [
+      {
+         q: 'Describe a time you had to learn a new tool quickly under deadline pressure.',
+         star: {
+            s: 'At Freelancer, a client requested an InVision prototype the week I started using the tool.',
+            t: 'Learn InVision well enough to deliver a 15-screen prototype in 4 days.',
+            a: 'Spent 6 hours on tutorials, reached out to the InVision community, built the prototype iteratively.',
+            r: 'Delivered on day 3 — client extended the contract for 3 additional months.'
+         }
+      },
+      {
+         q: 'How do you prioritise when you have multiple projects with competing deadlines?',
+         star: null,
+         hint: 'Show your system: client impact matrix, daily standup with stakeholders, under-promise over-deliver rule.'
+      }
+   ]
+};
+
+// ============================================================
+// OUTREACH TEMPLATES
+// ============================================================
+
+const TEMPLATES = {
+   cold: {
+      subject: 'UI/UX Designer with 5 YOE — Interested in [ROLE] at [COMPANY]',
+      body: `Dear [NAME],
+
+I came across [COMPANY]'s work through [WHERE] and was immediately drawn to [DETAIL].
+
+My name is Amrit Raju — a UI/UX and Brand Designer with 5+ years of experience creating digital products, brand identities, and web experiences across multiple industries. Most recently, I redesigned a sports app at Darkhorse that improved its App Store rating from 3.2 to 4.6 stars after launch.
+
+I noticed [COMPANY] is doing impressive work in [DETAIL], and I believe my background in UI/UX design and branding could add real value to your team.
+
+Would you be open to a 15-minute conversation? My portfolio: behance.net/GraphicDesign1
+
+Best regards,
+Amrit Raju
+amritgraphic4@gmail.com`
+   },
+   referral: {
+      subject: 'Referral Request — [ROLE] at [COMPANY]',
+      body: `Hi [NAME],
+
+Hope you're doing well! We connected via [WHERE] and I really appreciated your perspective on [DETAIL].
+
+I'm reaching out because I've been following [COMPANY] closely and recently applied for the [ROLE] position. I noticed you might have a connection there and was hoping you'd be willing to put in a kind word — or simply let me know if you think it's a strong fit.
+
+My portfolio showcases recent UI/UX and branding work: behance.net/GraphicDesign1
+
+No pressure at all — I completely understand if now isn't the right time!
+
+Thank you so much,
+Amrit`
+   },
+   followup: {
+      subject: 'Following Up: [ROLE] Application — Amrit Raju',
+      body: `Dear [NAME],
+
+I wanted to follow up on my application for the [ROLE] position at [COMPANY], submitted on [WHERE].
+
+I remain very excited about this opportunity — particularly given [DETAIL]. I believe my experience designing for both digital products and brand campaigns aligns well with what your team is building.
+
+Happy to provide any additional information or jump on a call at your convenience.
+
+Best regards,
+Amrit Raju`
+   },
+   linkedin: {
+      subject: '',
+      body: `Hi [NAME],
+
+I'm Amrit — a UI/UX and Brand Designer with 5 years of experience in Athens. I've been following [COMPANY]'s work and was particularly impressed by [DETAIL].
+
+I'd love to connect — no agenda, just keen to be part of the design community here.
+
+Amrit`
+   }
+};
+
+// ============================================================
+// LOCALSTORAGE UTILITIES
+// ============================================================
+
+function lsGet(key, fallback) {
+   try {
+      const v = localStorage.getItem(key);
+      return v ? JSON.parse(v) : fallback;
+   } catch(e) { return fallback; }
+}
+function lsSet(key, val) {
+   try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {}
+}
+function uid() {
+   return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
+function defaultApps() {
+   return [
+      { id:'s1', company:'ATCOM',     role:'UX/UI Designer',          status:'screening', date:'2026-05-07', salary:'Competitive', location:'Athens', priority:'strong' },
+      { id:'s2', company:'techne',    role:'UI/UX Designer',           status:'interview', date:'2026-05-03', salary:'TBD',         location:'Athens', priority:'hot'    },
+      { id:'s3', company:'Reborrn',   role:'Product Designer',         status:'applied',   date:'2026-05-12', salary:'Competitive', location:'Athens', priority:'strong' },
+      { id:'s4', company:'Domes Resorts', role:'Web & Graphic Designer',status:'applied',   date:'2026-05-13', salary:'Competitive', location:'Athens', priority:'hot'    }
+   ];
+}
+
+let apps    = lsGet('cid_apps',     defaultApps());
+let contacts= lsGet('cid_contacts', CONTACTS);
+let currentTemplate = 'cold';
+let currentInterviewCat = 'Design Process';
+
+// ============================================================
+// KPI — compute from apps
+// ============================================================
+
+function updateKPIs() {
+   const total = apps.length;
+   const replied = apps.filter(a => ['screening','interview','offer'].includes(a.status)).length;
+   const ivw = apps.filter(a => a.status === 'interview').length;
+   const rate = total > 0 ? Math.round((replied / total) * 100) : 0;
+
+   document.getElementById('kpi-apps').textContent = total || '—';
+   document.getElementById('kpi-apps-sub').textContent = total > 0 ? `${apps.filter(a=>a.status==='applied').length} awaiting response` : 'Track in Pipeline';
+
+   document.getElementById('kpi-rate').innerHTML = total > 0 ? `${rate}<small>%</small>` : '—<small>%</small>';
+   document.getElementById('kpi-rate-sub').textContent = rate > 22 ? '▲ Above market avg (22%)' : rate > 0 ? '≈ At market avg' : 'Avg market: 22%';
+   document.getElementById('kpi-rate-sub').className = 'kpi-trend ' + (rate > 22 ? 'up' : 'warn');
+
+   document.getElementById('kpi-ivw').textContent = ivw || '—';
+   document.getElementById('kpi-ivw-sub').textContent = ivw > 0 ? `${apps.filter(a=>a.status==='interview').map(a=>a.company).join(', ')}` : 'None active';
+}
+
+// ============================================================
+// RENDER — Keywords
+// ============================================================
+
+function renderKeywords() {
+   const g = document.getElementById('keyword-grid');
+   const pills = [
+      ...KEYWORDS.high.map(k => `<span class="kw-pill kw-high">${k}</span>`),
+      ...KEYWORDS.medium.map(k => `<span class="kw-pill kw-medium">${k}</span>`),
+      ...KEYWORDS.low.map(k => `<span class="kw-pill kw-low">${k}</span>`),
+      ...KEYWORDS.missing.map(k => `<span class="kw-pill kw-missing">${k}</span>`)
+   ];
+   g.innerHTML = pills.join('');
+}
+
+// ============================================================
+// RENDER — Skill Gaps
+// ============================================================
+
+function renderSkillGaps() {
+   const c = document.getElementById('skill-gaps-list');
+   c.innerHTML = SKILL_GAPS.map(s => {
+      const gap = s.demand > s.current;
+      const diff = s.demand - s.current;
+      return `
+         <div class="skill-gap-item">
+            <div class="sg-name">${s.skill}<span class="sg-pct">${s.current}%</span></div>
+            <div class="sg-track"><div class="sg-fill${gap?' gap-fill':''}" style="width:${s.current}%"></div></div>
+            <div class="sg-note ${gap?'warn':'ok'}">
+               ${gap ? `Market demands ${s.demand}% — gap: ${diff} pts` : `Meets market demand ✓`}
+            </div>
+         </div>`;
+   }).join('');
+}
+
+// ============================================================
+// RENDER — Job Matches
+// ============================================================
+
+function renderJobs() {
+   const sorted = [...JOB_MATCHES].sort((a,b) => b.matchPct - a.matchPct);
+   document.getElementById('jobs-tbody').innerHTML = sorted.map(j => {
+      const mc = j.matchPct >= 85 ? 'm-high' : j.matchPct >= 70 ? 'm-mid' : 'm-low';
+      const missing = j.missingSkills.length
+         ? j.missingSkills.map(s => `<span class="missing-tag">${s}</span>`).join('')
+         : '<span class="have-tag">None ✓</span>';
+      return `
+         <tr>
+            <td class="match-pct ${mc}">${j.matchPct}%</td>
+            <td style="font-family:'poppins-semibold',sans-serif;color:#fff;">${j.company}</td>
+            <td>${j.role}</td>
+            <td style="white-space:nowrap;font-size:1.2rem;">${j.salary}</td>
+            <td style="white-space:nowrap;">${j.location}</td>
+            <td>${missing}</td>
+            <td><span class="prio-badge b-${j.priority}">${j.priority.toUpperCase()}</span></td>
+            <td><a href="${j.url}" target="_blank" rel="noopener" class="apply-btn">Apply</a></td>
+         </tr>`;
+   }).join('');
+}
+
+// ============================================================
+// KANBAN
+// ============================================================
+
+function renderKanban() {
+   const statuses = ['applied','screening','interview','offer','rejected'];
+   statuses.forEach(s => {
+      const cards = apps.filter(a => a.status === s);
+      document.getElementById('cnt-' + s).textContent = cards.length;
+      document.getElementById('cards-' + s).innerHTML = cards.map(a => `
+         <div class="k-card" data-id="${a.id}">
+            <div class="k-co">${a.company}</div>
+            <div class="k-role">${a.role}</div>
+            <div class="k-meta">
+               <span><i class="fa fa-map-marker-alt"></i> ${a.location || '—'}</span>
+               <span><i class="fa fa-coins"></i> ${a.salary || '—'}</span>
+            </div>
+            <div class="k-date">Applied: ${a.date || '—'}</div>
+            <span class="prio-badge b-${a.priority}" style="margin-top:0.7rem;display:inline-block;">${a.priority.toUpperCase()}</span>
+         </div>`).join('');
+   });
+}
+
+function initKanban() {
+   renderKanban();
+   const statuses = ['applied','screening','interview','offer','rejected'];
+   statuses.forEach(s => {
+      Sortable.create(document.getElementById('cards-' + s), {
+         group: 'kanban',
+         animation: 180,
+         ghostClass: 'sortable-ghost',
+         onEnd: function(evt) {
+            const id = evt.item.dataset.id;
+            const newStatus = evt.to.closest('.kanban-col').dataset.status;
+            const app = apps.find(a => a.id === id);
+            if (app) {
+               app.status = newStatus;
+               lsSet('cid_apps', apps);
+               statuses.forEach(st => {
+                  document.getElementById('cnt-' + st).textContent =
+                     apps.filter(a => a.status === st).length;
+               });
+               updateKPIs();
+            }
+         }
+      });
+   });
+}
+
+function openModal(status) {
+   document.getElementById('m-status').value = status;
+   document.getElementById('m-company').value  = '';
+   document.getElementById('m-role').value     = '';
+   document.getElementById('m-salary').value   = '';
+   document.getElementById('m-location').value = '';
+   document.getElementById('m-date').value     = new Date().toISOString().slice(0,10);
+   document.getElementById('add-modal').classList.add('open');
+}
+function closeModal() {
+   document.getElementById('add-modal').classList.remove('open');
+}
+function saveApp() {
+   const a = {
+      id:       uid(),
+      company:  document.getElementById('m-company').value.trim()  || 'Company',
+      role:     document.getElementById('m-role').value.trim()     || 'Role',
+      status:   document.getElementById('m-status').value,
+      date:     document.getElementById('m-date').value,
+      salary:   document.getElementById('m-salary').value.trim(),
+      location: document.getElementById('m-location').value.trim() || 'Athens',
+      priority: 'good'
+   };
+   apps.push(a);
+   lsSet('cid_apps', apps);
+   renderKanban();
+   updateKPIs();
+   closeModal();
+   Sortable.get(document.getElementById('cards-' + a.status)) || initKanban();
+}
+
+// ============================================================
+// CONTACTS
+// ============================================================
+
+function renderContacts() {
+   document.getElementById('contacts-grid').innerHTML = contacts.map(c => `
+      <div class="contact-card">
+         <div class="c-avatar">${c.initials}</div>
+         <div class="c-name">${c.name}</div>
+         <div class="c-role">${c.role}</div>
+         <div class="c-role" style="color:#444;">${c.company}</div>
+         <span class="c-status s-${c.status}">${c.status.charAt(0).toUpperCase()+c.status.slice(1)}</span>
+         ${c.referral ? '<div class="c-referral"><i class="fa fa-star"></i> Referral opportunity</div>' : ''}
+         ${c.notes ? `<div class="c-notes">${c.notes}</div>` : ''}
+      </div>`).join('');
+}
+
+// ============================================================
+// ROADMAP
+// ============================================================
+
+function renderRoadmap() {
+   const icons = { 'fa-graduation-cap':'fa-graduation-cap','fa-layer-group':'fa-layer-group',
+                   'fa-universal-access':'fa-universal-access','fa-certificate':'fa-certificate',
+                   'fa-images':'fa-images','fa-film':'fa-film' };
+   document.getElementById('roadmap-timeline').innerHTML = ROADMAP.map(r => `
+      <div class="rm-item ${r.status}">
+         <div class="rm-h4"><i class="fa ${r.type}"></i> ${r.title}</div>
+         <div class="rm-meta">${r.platform} · ${r.duration}</div>
+         <div class="rm-reason"><i class="fa fa-lightbulb"></i> ${r.reason}</div>
+         <span class="rm-tag ${r.tag}">${r.tagText}</span>
+      </div>`).join('');
+
+   document.getElementById('cert-list').innerHTML = CERTS.map(c => `
+      <div style="display:flex;justify-content:space-between;align-items:center;
+                  padding:1.2rem 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+         <div>
+            <div style="font-family:'poppins-semibold',sans-serif;color:#fff;font-size:1.35rem;">${c.name}</div>
+            <div style="color:#555;font-size:1.2rem;font-family:'poppins-regular',sans-serif;">${c.platform} · ${c.duration} · ${c.cost}</div>
+         </div>
+         <span class="prio-badge ${c.priority==='High'?'b-hot':c.priority==='Medium'?'b-strong':'b-good'}">${c.priority}</span>
+      </div>`).join('');
+}
+
+// ============================================================
+// INTERVIEW PREP
+// ============================================================
+
+function renderInterviewQs() {
+   const qs = INTERVIEW_QS[currentInterviewCat] || [];
+   document.getElementById('interview-list').innerHTML = qs.map(q => {
+      const starHtml = q.star
+         ? `<div class="star-block">
+               <strong>Situation:</strong> ${q.star.s}<br>
+               <strong>Task:</strong> ${q.star.t}<br>
+               <strong>Action:</strong> ${q.star.a}<br>
+               <strong>Result:</strong> ${q.star.r}
+            </div>`
+         : `<div class="star-block" style="color:#3a3a3a;border-left-color:#333;">
+               ${q.hint || 'Add your STAR story — Situation · Task · Action · Result'}
+            </div>`;
+      return `<div class="q-card">
+         <div class="q-cat">${currentInterviewCat}</div>
+         <p class="q-text">${q.q}</p>
+         ${starHtml}
+      </div>`;
+   }).join('');
+}
+
+function selectInterviewCat(cat, btn) {
+   currentInterviewCat = cat;
+   document.querySelectorAll('#interview-tabs .tmpl-tab').forEach(b => b.classList.remove('active'));
+   if (btn) btn.classList.add('active');
+   renderInterviewQs();
+}
+
+// ============================================================
+// OUTREACH GENERATOR
+// ============================================================
+
+function getFields() {
+   return {
+      NAME:    document.getElementById('pz-name').value    || '[NAME]',
+      COMPANY: document.getElementById('pz-company').value || '[COMPANY]',
+      ROLE:    document.getElementById('pz-role').value    || '[ROLE]',
+      WHERE:   document.getElementById('pz-where').value   || '[WHERE]',
+      DETAIL:  document.getElementById('pz-detail').value  || '[DETAIL]',
+      MUTUAL:  document.getElementById('pz-mutual').value  || '[MUTUAL CONNECTION]'
+   };
+}
+
+function renderTemplate() {
+   const tmpl = TEMPLATES[currentTemplate];
+   const f = getFields();
+
+   function sub(txt) {
+      return txt
+         .replace(/\[NAME\]/g,    f.NAME    === '[NAME]'    ? '<span class="ph-field">[NAME]</span>'    : f.NAME)
+         .replace(/\[COMPANY\]/g, f.COMPANY === '[COMPANY]' ? '<span class="ph-field">[COMPANY]</span>' : f.COMPANY)
+         .replace(/\[ROLE\]/g,    f.ROLE    === '[ROLE]'    ? '<span class="ph-field">[ROLE]</span>'    : f.ROLE)
+         .replace(/\[WHERE\]/g,   f.WHERE   === '[WHERE]'   ? '<span class="ph-field">[WHERE]</span>'   : f.WHERE)
+         .replace(/\[DETAIL\]/g,  f.DETAIL  === '[DETAIL]'  ? '<span class="ph-field">[DETAIL]</span>'  : f.DETAIL)
+         .replace(/\[MUTUAL\]/g,  f.MUTUAL  === '[MUTUAL CONNECTION]' ? '<span class="ph-field">[MUTUAL]</span>' : f.MUTUAL);
+   }
+
+   const subjectEl = document.getElementById('tmpl-subject');
+   if (tmpl.subject) {
+      subjectEl.style.display = 'block';
+      subjectEl.innerHTML = 'Subject: ' + sub(tmpl.subject);
+   } else {
+      subjectEl.style.display = 'none';
+   }
+   document.getElementById('tmpl-body').innerHTML = sub(tmpl.body);
+
+   // update active tab
+   document.querySelectorAll('.tmpl-tab').forEach(b => {
+      b.classList.toggle('active', b.getAttribute('onclick') && b.getAttribute('onclick').includes("'"+currentTemplate+"'"));
+   });
+}
+
+function selectTemplate(type) {
+   currentTemplate = type;
+   renderTemplate();
+}
+
+function copyTemplate() {
+   const bodyEl = document.getElementById('tmpl-body');
+   const text = bodyEl.innerText || bodyEl.textContent;
+   navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('copy-btn');
+      const orig = btn.innerHTML;
+      btn.innerHTML = '<i class="fa fa-check"></i> Copied!';
+      setTimeout(() => btn.innerHTML = orig, 2000);
+   }).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = bodyEl.innerText;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+   });
+}
+
+function clearFields() {
+   ['pz-name','pz-company','pz-role','pz-where','pz-detail','pz-mutual']
+      .forEach(id => document.getElementById(id).value = '');
+   renderTemplate();
+}
+
+// ============================================================
+// CHART.JS CONFIGURATIONS
+// ============================================================
+
+function initCharts() {
+   Chart.defaults.color = '#666';
+   Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
+
+   /* ATS Gauge (doughnut) */
+   new Chart(document.getElementById('ats-gauge-canvas').getContext('2d'), {
+      type: 'doughnut',
+      data: {
+         datasets: [{
+            data: [ATS.overall, 100 - ATS.overall],
+            backgroundColor: ['#FF0077', 'rgba(255,255,255,0.05)'],
+            borderWidth: 0,
+            borderRadius: 4
+         }]
+      },
+      options: {
+         circumference: 180,
+         rotation: -90,
+         cutout: '76%',
+         responsive: true,
+         animation: { duration: 1200, easing: 'easeInOutQuart' },
+         plugins: { legend: { display: false }, tooltip: { enabled: false } }
+      }
+   });
+
+   /* ATS Breakdown (h-bar) */
+   new Chart(document.getElementById('ats-breakdown-canvas').getContext('2d'), {
+      type: 'bar',
+      data: {
+         labels: ATS.breakdown.map(d => d.cat),
+         datasets: [{
+            data: ATS.breakdown.map(d => d.score),
+            backgroundColor: ATS.breakdown.map(d =>
+               d.score >= 75 ? '#FF0077' : d.score >= 60 ? '#7a003b' : '#333'),
+            borderRadius: 3
+         }]
+      },
+      options: {
+         indexAxis: 'y', responsive: true,
+         scales: {
+            x: { max: 100, ticks: { color: '#555', font: { size: 11 } } },
+            y: { grid: { display: false }, ticks: { color: '#ccc', font: { size: 11 } } }
+         },
+         plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => `  ${c.parsed.x}/100` } } },
+         animation: { delay: (ctx) => ctx.dataIndex * 70 }
+      }
+   });
+
+   /* Career Fit (h-bar) */
+   new Chart(document.getElementById('career-fit-canvas').getContext('2d'), {
+      type: 'bar',
+      data: {
+         labels: ['Freelance UI/UX + Brand','Web Designer','Brand / Art Director',
+                  'Senior UI/UX Designer','Graphic Designer','Product Designer'],
+         datasets: [{
+            label: 'Fit %',
+            data: [97, 96, 91, 88, 85, 75],
+            backgroundColor: ['#FF0077','#cc005f','rgba(255,0,119,0.8)',
+               'rgba(255,0,119,0.65)','rgba(255,0,119,0.5)','rgba(255,0,119,0.35)'],
+            borderRadius: 3
+         }]
+      },
+      options: {
+         indexAxis: 'y', responsive: true,
+         scales: {
+            x: { max: 100, ticks: { color: '#555', font: { size: 11 } } },
+            y: { grid: { display: false }, ticks: { color: '#ccc', font: { size: 11 } } }
+         },
+         plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => `  ${c.parsed.x}% fit` } } }
+      }
+   });
+
+   /* Keyword Coverage Bar */
+   new Chart(document.getElementById('keyword-bar-canvas').getContext('2d'), {
+      type: 'bar',
+      data: {
+         labels: ['High Coverage','Medium Coverage','Low Coverage','Missing'],
+         datasets: [{
+            data: [KEYWORDS.high.length, KEYWORDS.medium.length, KEYWORDS.low.length, KEYWORDS.missing.length],
+            backgroundColor: ['#FF0077','rgba(255,0,119,0.55)','#3a3a3a','rgba(100,100,100,0.3)'],
+            borderRadius: 4
+         }]
+      },
+      options: {
+         responsive: true,
+         scales: {
+            y: { ticks: { color: '#555', font: { size: 11 } }, beginAtZero: true },
+            x: { grid: { display: false }, ticks: { color: '#ccc', font: { size: 11 } } }
+         },
+         plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => `  ${c.parsed.y} keywords` } } }
+      }
+   });
+
+   /* Skills Radar */
+   new Chart(document.getElementById('radar-canvas').getContext('2d'), {
+      type: 'radar',
+      data: {
+         labels: ['Web Design','UI/UX','Branding','Graphic Design','WordPress',
+                  'Design Systems','Accessibility','Motion'],
+         datasets: [
+            {
+               label: 'Current Level',
+               data: [95, 85, 95, 90, 80, 40, 30, 35],
+               backgroundColor: 'rgba(255,0,119,0.12)',
+               borderColor: '#FF0077',
+               borderWidth: 2,
+               pointBackgroundColor: '#FF0077',
+               pointRadius: 3
+            },
+            {
+               label: 'Market Demand',
+               data: [90, 92, 85, 82, 72, 82, 70, 60],
+               backgroundColor: 'rgba(255,255,255,0.03)',
+               borderColor: 'rgba(255,255,255,0.25)',
+               borderWidth: 1,
+               borderDash: [4,4],
+               pointBackgroundColor: 'rgba(255,255,255,0.25)',
+               pointRadius: 3
+            }
+         ]
+      },
+      options: {
+         responsive: true,
+         scales: {
+            r: {
+               min: 0, max: 100,
+               grid: { color: 'rgba(255,255,255,0.05)' },
+               angleLines: { color: 'rgba(255,255,255,0.05)' },
+               ticks: { display: false, stepSize: 25 },
+               pointLabels: { color: '#ccc', font: { size: 11 } }
+            }
+         },
+         plugins: {
+            legend: { labels: { color: '#666', font: { size: 11 }, boxWidth: 12 } }
+         }
+      }
+   });
+}
+
+// ============================================================
+// HEADER MOBILE MENU (matches main.js pattern)
+// ============================================================
+
+function initNav() {
+   var toggle = document.querySelector('.menu-toggle'),
+       nav    = document.querySelector('.main-navigation');
+   if (!toggle || !nav) return;
+   toggle.addEventListener('click', function(e) {
+      e.preventDefault();
+      toggle.classList.toggle('is-clicked');
+      $(nav).slideToggle(300);
+   });
+   nav.querySelectorAll('a').forEach(function(a) {
+      a.addEventListener('click', function() {
+         toggle.classList.remove('is-clicked');
+         $(nav).fadeOut(300);
+      });
+   });
+}
+
+// ============================================================
+// INIT
+// ============================================================
+
+document.addEventListener('DOMContentLoaded', function() {
+   updateKPIs();
+   renderKeywords();
+   renderSkillGaps();
+   renderJobs();
+   initKanban();
+   renderContacts();
+   renderRoadmap();
+   renderInterviewQs();
+   renderTemplate();
+   initCharts();
+   initNav();
+
+   // Preloader
+   setTimeout(function() {
+      var l = document.getElementById('loader'),
+          p = document.getElementById('preloader');
+      if (l) { l.style.opacity = '0'; l.style.transition = 'opacity 0.3s'; }
+      setTimeout(function() { if (p) p.style.display = 'none'; }, 350);
+   }, 600);
+
+   // Back to top
+   var goTop = document.getElementById('go-top');
+   if (goTop) {
+      window.addEventListener('scroll', function() {
+         goTop.style.display = window.scrollY > 300 ? 'block' : 'none';
+      });
+      goTop.querySelector('a').addEventListener('click', function(e) {
+         e.preventDefault();
+         window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+   }
+});
+</script>
+
+</body>
+</html>
