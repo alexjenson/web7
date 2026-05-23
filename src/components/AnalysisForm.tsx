@@ -5,6 +5,7 @@ import { parseUsername } from "@/lib/parseUsername";
 import { useAnalysis } from "@/hooks/useAnalysis";
 import { ErrorBanner } from "./ErrorBanner";
 import { ResultsPanel } from "./ResultsPanel";
+import { APISuccessResponse } from "@/lib/types";
 
 const NICHES = [
   "Fitness & Wellness", "Food & Cooking", "Travel", "Fashion",
@@ -33,7 +34,8 @@ export function AnalysisForm() {
   const [niche, setNiche] = useState("");
   const [format, setFormat] = useState<"Reels" | "Photos" | "Carousels" | "Mixed" | "">("");
   const [language, setLanguage] = useState("English");
-  const { state, analyze, reset } = useAnalysis();
+  const [lastData, setLastData] = useState<APISuccessResponse | null>(null);
+  const { state, analyze, refresh, reset } = useAnalysis();
 
   const parsed = parseUsername(username);
 
@@ -43,12 +45,20 @@ export function AnalysisForm() {
     analyze({ username: parsed, niche, format, language });
   }
 
-  if (state.status === "success") {
+  if (state.status === "success" && state.data !== lastData) {
+    setLastData(state.data);
+  }
+
+  if (lastData && (state.status === "success" || state.status === "loading")) {
+    const isRefreshing = state.status === "loading";
+    const displayData = state.status === "success" ? state.data : lastData;
     return (
       <ResultsPanel
-        username={state.data.username}
-        analysis={state.data.analysis}
-        onReset={() => { reset(); setUsername(""); setNiche(""); setFormat(""); }}
+        username={displayData.username}
+        analysis={displayData.analysis}
+        onReset={() => { reset(); setLastData(null); setUsername(""); setNiche(""); setFormat(""); }}
+        onRefresh={refresh}
+        refreshing={isRefreshing}
       />
     );
   }
