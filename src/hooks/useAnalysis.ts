@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { APISuccessResponse } from "@/lib/types";
+import { APISuccessResponse, UserInput } from "@/lib/types";
 
 type State =
   | { status: "idle" }
-  | { status: "loading"; step: 0 | 1 | 2 }
+  | { status: "loading" }
   | { status: "success"; data: APISuccessResponse }
   | { status: "error"; code: string; message: string };
 
@@ -18,52 +18,25 @@ export function useAnalysis() {
     timersRef.current = [];
   }
 
-  async function analyze(username: string) {
+  async function analyze(input: UserInput) {
     clearTimers();
-    setState({ status: "loading", step: 0 });
-
-    timersRef.current = [
-      setTimeout(
-        () =>
-          setState((s) =>
-            s.status === "loading" ? { ...s, step: 1 } : s
-          ),
-        1500
-      ),
-      setTimeout(
-        () =>
-          setState((s) =>
-            s.status === "loading" ? { ...s, step: 2 } : s
-          ),
-        3000
-      ),
-    ];
+    setState({ status: "loading" });
 
     try {
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username }),
+        body: JSON.stringify(input),
       });
       const data = await res.json();
-      clearTimers();
 
       if (!res.ok) {
-        setState({
-          status: "error",
-          code: data.error?.code ?? "UNKNOWN",
-          message: data.error?.message ?? "Something went wrong",
-        });
+        setState({ status: "error", code: data.error?.code ?? "UNKNOWN", message: data.error?.message ?? "Something went wrong" });
       } else {
         setState({ status: "success", data });
       }
     } catch {
-      clearTimers();
-      setState({
-        status: "error",
-        code: "NETWORK_ERROR",
-        message: "Network error — please check your connection and try again",
-      });
+      setState({ status: "error", code: "NETWORK_ERROR", message: "Network error — please check your connection" });
     }
   }
 

@@ -1,25 +1,8 @@
-export interface InstagramProfile {
+export interface UserInput {
   username: string;
-  full_name: string;
-  biography: string;
-  profile_pic_url: string;
-  follower_count: number;
-  following_count: number;
-  media_count: number;
-  is_private: boolean;
-  is_verified: boolean;
-  category_name: string | null;
-  external_url: string | null;
-}
-
-export interface InstagramPost {
-  type: "IMAGE" | "VIDEO" | "SIDECAR";
-  caption: string;
-  likes: number;
-  comments: number;
-  views: number | null;
-  visual_description: string | null;
-  timestamp: number;
+  niche: string;
+  format: "Reels" | "Photos" | "Carousels" | "Mixed";
+  language: string;
 }
 
 export interface NicheAnalysis {
@@ -59,15 +42,10 @@ export interface AnalysisResult {
 }
 
 export interface APISuccessResponse {
-  profile: InstagramProfile;
+  username: string;
   analysis: AnalysisResult;
 }
 
 export interface APIErrorResponse {
-  error: {
-    code: string;
-    message: string;
-  };
+  error: { code: string; message: string };
 }
-
-export type APIResponse = APISuccessResponse | APIErrorResponse;

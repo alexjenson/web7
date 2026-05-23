@@ -1,210 +1,7 @@
-import { InstagramProfile, InstagramPost, AnalysisResult, TrendingTopic } from "./types";
+import { UserInput, AnalysisResult, TrendingTopic } from "./types";
 
-// ─── Language Detection ────────────────────────────────────────────────────
+// (old detection functions removed — analysis now based on user input)
 
-const LANG_WORDS: Record<string, string[]> = {
-  Spanish: ["hola", "gracias", "amor", "vida", "muy", "pero", "para", "que", "con", "los", "las", "del", "una", "todo", "bien", "aqui", "cuando", "como", "más", "también", "esto"],
-  Portuguese: ["obrigado", "você", "muito", "para", "com", "isso", "pela", "mais", "quero", "bom", "boa", "aqui", "quando", "como", "também", "tudo", "meu", "esse", "nossa"],
-  French: ["bonjour", "merci", "avec", "pour", "dans", "les", "des", "une", "pas", "qui", "sur", "mon", "tout", "très", "mais", "quand", "comme", "aussi", "encore", "suis"],
-  German: ["danke", "schön", "und", "ich", "das", "die", "der", "ein", "ist", "von", "mit", "für", "auf", "nicht", "auch", "noch", "aber", "oder", "wie", "wenn"],
-  Italian: ["grazie", "ciao", "bella", "tutto", "sono", "molto", "anche", "questo", "per", "con", "una", "che", "del", "nel", "della", "fare", "quando"],
-  Turkish: ["teşekkür", "güzel", "merhaba", "seviyorum", "çok", "ama", "ile", "bir", "bu", "var", "için", "ben", "sen", "biz", "artık", "nasıl"],
-  Hindi: ["aur", "hai", "kya", "nahi", "bahut", "lekin", "toh", "yaar", "bhai", "dost", "hum", "mera", "tera", "main", "kar", "agar", "sab", "accha"],
-  Indonesian: ["aku", "kamu", "dan", "yang", "ini", "itu", "dengan", "untuk", "adalah", "tidak", "juga", "sudah", "dari", "akan", "bisa", "kalau", "tapi"],
-};
-
-function detectLanguage(texts: string[]): { primary: string; secondary: string | null; region: string; audienceNote: string } {
-  const combined = texts.join(" ").toLowerCase();
-
-  if (/[؀-ۿ]/.test(combined)) return { primary: "Arabic", secondary: null, region: "Middle East / North Africa", audienceNote: "Content is primarily written in Arabic, targeting Arab-speaking communities." };
-  if (/[ऀ-ॿ]/.test(combined)) return { primary: "Hindi", secondary: null, region: "India", audienceNote: "Content is in Hindi/Devanagari script, targeting Indian audiences." };
-  if (/[぀-ゟ゠-ヿ]/.test(combined)) return { primary: "Japanese", secondary: null, region: "Japan", audienceNote: "Content is in Japanese, targeting Japan-based audiences." };
-  if (/[가-힯]/.test(combined)) return { primary: "Korean", secondary: null, region: "South Korea", audienceNote: "Content is in Korean, targeting Korean-speaking communities." };
-  if (/[฀-๿]/.test(combined)) return { primary: "Thai", secondary: null, region: "Thailand", audienceNote: "Content is in Thai script, targeting Thai audiences." };
-  if (/[Ѐ-ӿ]/.test(combined)) return { primary: "Russian", secondary: null, region: "Russia / Eastern Europe", audienceNote: "Content is in Cyrillic, targeting Russian-speaking audiences." };
-  if (/[一-鿿]/.test(combined)) return { primary: "Chinese", secondary: null, region: "China / Taiwan / Singapore", audienceNote: "Content uses Chinese characters, targeting Chinese-speaking audiences." };
-
-  const scores: Record<string, number> = {};
-  for (const [lang, words] of Object.entries(LANG_WORDS)) {
-    scores[lang] = words.filter(w => new RegExp(`\\b${w}\\b`, "i").test(combined)).length;
-  }
-  const top = Object.entries(scores).sort((a, b) => b[1] - a[1]);
-  const [first, second] = top;
-
-  if (first[1] >= 3) {
-    const regionMap: Record<string, string> = {
-      Spanish: "Latin America / Spain",
-      Portuguese: "Brazil / Portugal",
-      French: "France / Francophone",
-      German: "Germany / Austria / Switzerland",
-      Italian: "Italy",
-      Turkish: "Turkey",
-      Hindi: "India",
-      Indonesian: "Indonesia / Southeast Asia",
-    };
-    const audienceMap: Record<string, string> = {
-      Spanish: "Captions use Spanish, targeting Latin American or Spanish audiences.",
-      Portuguese: "Primarily Portuguese captions, likely targeting Brazilian audiences.",
-      French: "French-language content for Francophone communities.",
-      German: "German captions targeting DACH-region audiences.",
-      Italian: "Italian-language content for Italian communities.",
-      Turkish: "Turkish captions targeting Turkish-speaking audiences.",
-      Hindi: "Hindi captions targeting Indian audiences.",
-      Indonesian: "Indonesian-language content targeting Southeast Asian audiences.",
-    };
-    return {
-      primary: first[0],
-      secondary: second[1] >= 2 ? second[0] : null,
-      region: regionMap[first[0]] ?? "Global",
-      audienceNote: audienceMap[first[0]] ?? `Content is primarily in ${first[0]}.`,
-    };
-  }
-
-  return { primary: "English", secondary: null, region: "Global / English-speaking", audienceNote: "Content is primarily in English, suitable for a global audience." };
-}
-
-// ─── Niche Detection ───────────────────────────────────────────────────────
-
-const NICHE_KEYWORDS: Record<string, string[]> = {
-  "Fitness & Wellness": ["fitness", "workout", "gym", "health", "exercise", "training", "fit", "bodybuilding", "crossfit", "yoga", "pilates", "cardio", "strength", "gains", "nutrition", "protein", "muscle", "weightloss", "transformation", "hiit", "running", "marathon", "athlete", "wellness", "healthy"],
-  "Food & Cooking": ["food", "foodie", "cooking", "recipe", "chef", "eat", "restaurant", "foodphotography", "yummy", "delicious", "homemade", "baking", "kitchen", "vegan", "vegetarian", "mealprep", "dinner", "lunch", "breakfast", "dessert", "cake", "pizza", "instafood", "foodblogger", "tasty"],
-  "Travel": ["travel", "wanderlust", "adventure", "explore", "traveler", "vacation", "trip", "tourism", "backpacking", "travelblogger", "instatravel", "travelgram", "beach", "mountain", "nature", "landscape", "holiday", "destination", "passport", "worldtravel", "travelphotography"],
-  "Fashion": ["fashion", "style", "ootd", "outfit", "clothing", "streetstyle", "model", "fashionista", "fashionblogger", "trendy", "luxury", "designer", "wearable", "aesthetic", "lookbook", "styling", "fashionweek", "couture", "wardrobe", "outfitoftheday"],
-  "Beauty & Skincare": ["beauty", "makeup", "skincare", "cosmetics", "glam", "lipstick", "tutorial", "beautyblender", "foundation", "eyeshadow", "beautyblogger", "makeuptutorial", "skincareroutine", "glow", "selfcare", "beautycare", "nails", "hair", "hairstyle", "haircare"],
-  "Tech & Gadgets": ["tech", "technology", "coding", "programming", "developer", "software", "startup", "ai", "gadgets", "smartphone", "apple", "android", "cybersecurity", "coding", "webdev", "machinelearning", "innovation", "techtips", "iot", "blockchain"],
-  "Business & Entrepreneurship": ["business", "entrepreneur", "startup", "marketing", "success", "money", "mindset", "motivation", "hustle", "ceo", "leadership", "branding", "strategy", "investment", "passive income", "ecommerce", "digitalmarketing", "smallbusiness", "businesstips"],
-  "Photography & Videography": ["photography", "photographer", "photo", "camera", "lightroom", "portrait", "landscape", "photoshoot", "videography", "filmmaker", "cinematography", "editing", "colorgrading", "nikon", "canon", "sony", "lens", "drone", "dslr", "instagram photography"],
-  "Art & Design": ["art", "artist", "design", "creative", "illustration", "drawing", "painting", "digitalart", "graphicdesign", "artwork", "sketchbook", "procreate", "watercolor", "abstract", "contemporary", "artgallery", "fanart", "designinspiration"],
-  "Music": ["music", "musician", "singer", "song", "band", "guitar", "piano", "rap", "hiphop", "rnb", "pop", "producer", "recording", "studio", "concert", "live", "newmusic", "songwriter", "beatmaker", "melody"],
-  "Gaming": ["gaming", "gamer", "game", "esports", "twitch", "playstation", "xbox", "nintendo", "pcgaming", "fps", "rpg", "streaming", "valorant", "minecraft", "fortnite", "videogames", "gamingsetup", "ps5"],
-  "Education & Learning": ["education", "learning", "study", "school", "teacher", "knowledge", "tips", "howto", "tutorial", "studytips", "motivation", "growth", "books", "reading", "college", "university", "skill", "edtech", "onlinelearning"],
-  "Lifestyle": ["lifestyle", "life", "daily", "motivation", "inspiration", "quotes", "wellness", "morningroutine", "productive", "routine", "selfimprovement", "positivity", "mindfulness", "balance", "goals", "journal", "minimalism", "aesthetic"],
-  "Parenting & Family": ["parenting", "mom", "dad", "baby", "kids", "family", "children", "motherhood", "fatherhood", "toddler", "newborn", "pregnancy", "momlife", "dadlife", "parenthood", "familytime", "raisingkids"],
-  "Comedy & Entertainment": ["comedy", "funny", "humor", "memes", "entertainment", "jokes", "lol", "viral", "trending", "skits", "standup", "parody", "reels", "funnymemes", "relatable"],
-  "Sports": ["sports", "football", "basketball", "soccer", "cricket", "tennis", "athlete", "nba", "nfl", "fifa", "training", "coach", "sportsmotivation", "champion", "sportslife"],
-  "Finance & Investing": ["finance", "investing", "stocks", "money", "wealth", "trading", "crypto", "bitcoin", "personalfinance", "financetips", "savemoney", "investment", "financialfreedom", "budgeting", "realestate"],
-  "Nature & Sustainability": ["nature", "environment", "sustainability", "green", "wildlife", "conservation", "eco", "earthday", "climate", "organic", "zerowaste", "plantbased", "outdoors", "hiking", "camping", "forest"],
-  "Pets & Animals": ["pets", "dog", "cat", "animals", "puppy", "kitten", "petlover", "dogsofinstagram", "catsofinstagram", "animal", "wildlife", "petsofinstagram", "doglover", "catlover"],
-  "DIY & Crafts": ["diy", "crafts", "handmade", "craft", "creative", "homedecor", "diycrafts", "tutorial", "homemade", "sewing", "knitting", "woodworking", "upcycle", "makerspace"],
-};
-
-function extractHashtags(text: string): string[] {
-  return (text.match(/#(\w+)/g) ?? []).map(h => h.slice(1).toLowerCase());
-}
-
-function scoreNiche(texts: string[], bio: string, category: string | null): { primary: string; secondary: string | null; confidence: "high" | "medium" | "low"; reasoning: string } {
-  const allText = (texts.join(" ") + " " + bio + " " + (category ?? "")).toLowerCase();
-  const hashtags = texts.flatMap(t => extractHashtags(t));
-  const hashtagText = hashtags.join(" ");
-
-  const scores: Record<string, number> = {};
-  for (const [niche, keywords] of Object.entries(NICHE_KEYWORDS)) {
-    let score = 0;
-    for (const kw of keywords) {
-      if (allText.includes(kw)) score += 1;
-      if (hashtagText.includes(kw)) score += 2; // hashtags weight more
-      if ((category ?? "").toLowerCase().includes(kw)) score += 3; // category label weight most
-    }
-    scores[niche] = score;
-  }
-
-  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
-  const [first, second] = sorted;
-  const topScore = first[1];
-
-  const confidence: "high" | "medium" | "low" =
-    topScore >= 10 ? "high" : topScore >= 5 ? "medium" : "low";
-
-  const reasoning =
-    topScore >= 10
-      ? `Strong ${first[0]} signals found across hashtags, captions, and bio keywords.`
-      : topScore >= 5
-      ? `Moderate ${first[0]} indicators detected in content patterns and hashtag usage.`
-      : `Limited signals available — estimated niche based on available bio and caption data.`;
-
-  return {
-    primary: first[0],
-    secondary: second[1] >= 3 ? second[0] : null,
-    confidence,
-    reasoning,
-  };
-}
-
-// ─── Content Style Analysis ────────────────────────────────────────────────
-
-function analyzeStyle(posts: InstagramPost[], profile: InstagramProfile) {
-  const total = posts.length;
-  if (total === 0) {
-    return {
-      formats: ["Unknown"],
-      dominantFormat: "Unknown",
-      tone: "Not enough data",
-      postingPattern: "No posts available",
-      visualStyle: "No posts available",
-    };
-  }
-
-  const counts = { VIDEO: 0, SIDECAR: 0, IMAGE: 0 };
-  for (const p of posts) counts[p.type]++;
-
-  const formats: string[] = [];
-  if (counts.VIDEO > 0) formats.push(`Reels/Videos (${counts.VIDEO})`);
-  if (counts.SIDECAR > 0) formats.push(`Carousels (${counts.SIDECAR})`);
-  if (counts.IMAGE > 0) formats.push(`Photos (${counts.IMAGE})`);
-
-  const dominantRaw = (Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0]) as "VIDEO" | "SIDECAR" | "IMAGE";
-  const dominantLabel = { VIDEO: "Reels/Videos", SIDECAR: "Carousels", IMAGE: "Static Photos" }[dominantRaw];
-
-  // Engagement rate
-  const avgLikes = posts.reduce((s, p) => s + p.likes, 0) / total;
-  const followers = profile.follower_count || 1;
-  const engRate = ((avgLikes / followers) * 100).toFixed(1);
-
-  // Caption tone from keywords
-  const allCaptions = posts.map(p => p.caption).join(" ").toLowerCase();
-  const toneMap: [string, string[]][] = [
-    ["Motivational & Inspirational", ["motivation", "inspire", "dream", "goal", "success", "believe", "hustle", "mindset"]],
-    ["Educational & Informative", ["tips", "how to", "learn", "guide", "tutorial", "fact", "know", "step", "advice"]],
-    ["Funny & Entertaining", ["lol", "haha", "funny", "joke", "meme", "humor", "laugh", "comedy", "hilarious"]],
-    ["Personal & Authentic", ["my", "i feel", "sharing", "honest", "real", "personal", "story", "journey"]],
-    ["Promotional & Commercial", ["shop", "buy", "link in bio", "discount", "sale", "promo", "offer", "dm"]],
-  ];
-  let bestTone = "Authentic & Engaging";
-  let bestScore = 0;
-  for (const [tone, words] of toneMap) {
-    const score = words.filter(w => allCaptions.includes(w)).length;
-    if (score > bestScore) { bestScore = score; bestTone = tone; }
-  }
-
-  // Posting frequency estimate from timestamps
-  let postingPattern = "Regular posting schedule";
-  if (posts.length >= 2 && posts[0].timestamp && posts[posts.length - 1].timestamp) {
-    const newest = posts[0].timestamp;
-    const oldest = posts[posts.length - 1].timestamp;
-    const days = (newest - oldest) / 86400;
-    if (days > 0) {
-      const perWeek = (posts.length / days * 7).toFixed(1);
-      postingPattern = `~${perWeek}x per week — ${dominantLabel} dominant`;
-    }
-  }
-
-  // Visual style hints
-  const hasShortCaptions = posts.filter(p => p.caption.length < 100).length > total / 2;
-  const hasHashtags = posts.some(p => p.caption.includes("#"));
-  const visualStyle = hasShortCaptions
-    ? "Minimal captions, visuals-first approach"
-    : hasHashtags
-    ? "Caption-rich with active hashtag strategy"
-    : "Long-form captions, storytelling-focused";
-
-  return {
-    formats: formats.length ? formats : ["Photos"],
-    dominantFormat: dominantLabel,
-    tone: `${bestTone} (avg engagement ${engRate}%)`,
-    postingPattern,
-    visualStyle,
-  };
-}
 
 // ─── Trending Topics Database ──────────────────────────────────────────────
 
@@ -393,23 +190,75 @@ const GENERIC_TOPICS: TrendingTopic[] = [
   { title: "My predictions for where this is all going in 2025-2026", format: "Carousel", hook: "I've watched this space long enough to have strong opinions.", rationale: "Predictive content positions creators as forward-thinking authorities." },
 ];
 
-function getTrendingTopics(niche: string): TrendingTopic[] {
+const LANGUAGE_REGIONS: Record<string, { region: string; audienceNote: string }> = {
+  English:    { region: "Global / English-speaking", audienceNote: "English content reaches the largest global Instagram audience." },
+  Spanish:    { region: "Latin America / Spain", audienceNote: "Spanish content targets 500M+ speakers across LatAm and Spain." },
+  Portuguese: { region: "Brazil / Portugal", audienceNote: "Portuguese content, likely targeting Brazil — the #2 Instagram market." },
+  Hindi:      { region: "India", audienceNote: "Hindi content targets India's massive and fast-growing Instagram user base." },
+  Arabic:     { region: "Middle East / North Africa", audienceNote: "Arabic content reaches high-engagement MENA communities." },
+  French:     { region: "France / Francophone Africa", audienceNote: "French content covers a wide geographic reach including Africa." },
+  German:     { region: "Germany / Austria / Switzerland", audienceNote: "German content targets the high-income DACH region." },
+  Italian:    { region: "Italy", audienceNote: "Italian content for one of Europe's most active Instagram markets." },
+  Japanese:   { region: "Japan", audienceNote: "Japanese content targets one of Asia's highest-spend audiences." },
+  Korean:     { region: "South Korea", audienceNote: "Korean content benefits from K-culture's global reach and influence." },
+  Turkish:    { region: "Turkey", audienceNote: "Turkish content targets one of the fastest-growing Instagram markets." },
+  Indonesian: { region: "Indonesia / Southeast Asia", audienceNote: "Indonesian content targets the world's 4th most populous country." },
+};
+
+const FORMAT_STYLE: Record<string, { tone: string; postingPattern: string; visualStyle: string }> = {
+  Reels:     { tone: "Dynamic & Entertaining", postingPattern: "3–5 Reels per week recommended for max reach", visualStyle: "Fast cuts, trending audio, text overlays, hook in first 3 seconds" },
+  Photos:    { tone: "Aesthetic & Aspirational", postingPattern: "4–7 posts per week, consistent grid aesthetic", visualStyle: "High-quality visuals, clean composition, strong color palette" },
+  Carousels: { tone: "Educational & Value-driven", postingPattern: "2–4 carousels per week, save-worthy content", visualStyle: "Slide 1 hooks, minimal text per slide, strong CTA on last slide" },
+  Mixed:     { tone: "Versatile & Engaging", postingPattern: "Mix of Reels (reach) + Carousels (saves) + Photos (brand)", visualStyle: "Consistent brand colors, varied formats for different goals" },
+};
+
+function getTrendingTopics(niche: string, format: string): TrendingTopic[] {
   const topics = TRENDING_TOPICS[niche] ?? GENERIC_TOPICS;
-  // Shuffle slightly to feel fresh, always return 10
-  const shuffled = [...topics].sort(() => Math.random() - 0.3);
+  // Filter to prefer matching format, then fill with others
+  const preferred = topics.filter(t =>
+    format === "Mixed" || format === "Photos"
+      ? true
+      : format === "Reels"
+      ? t.format === "Reel"
+      : t.format === "Carousel"
+  );
+  const rest = topics.filter(t => !preferred.includes(t));
+  const ordered = [...preferred, ...rest];
+  const shuffled = ordered.sort(() => Math.random() - 0.2);
   return shuffled.slice(0, 10);
 }
 
-// ─── Main Analyzer ─────────────────────────────────────────────────────────
+// ─── Main Analyzer (from user input) ──────────────────────────────────────
 
-export function analyze(profile: InstagramProfile, posts: InstagramPost[]): AnalysisResult {
-  const captions = posts.map(p => p.caption).filter(Boolean);
-  const allText = [profile.biography, ...captions];
+export function analyzeFromInput(input: UserInput): AnalysisResult {
+  const { niche, format, language } = input;
 
-  const niche = scoreNiche(captions, profile.biography, profile.category_name);
-  const language = detectLanguage(allText);
-  const contentStyle = analyzeStyle(posts, profile);
-  const trendingTopics = getTrendingTopics(niche.primary);
+  const langInfo = LANGUAGE_REGIONS[language] ?? LANGUAGE_REGIONS["English"];
+  const styleInfo = FORMAT_STYLE[format] ?? FORMAT_STYLE["Mixed"];
 
-  return { niche, language, contentStyle, trendingTopics };
+  const nicheResult = {
+    primary: niche,
+    secondary: null,
+    confidence: "high" as const,
+    reasoning: `You selected ${niche} as your niche. Topics and recommendations are fully tailored to this category.`,
+  };
+
+  const contentStyle = {
+    formats: format === "Mixed" ? ["Reels", "Carousels", "Static Photos"] : [format === "Photos" ? "Static Photos" : format],
+    dominantFormat: format === "Photos" ? "Static Photos" : format,
+    tone: styleInfo.tone,
+    postingPattern: styleInfo.postingPattern,
+    visualStyle: styleInfo.visualStyle,
+  };
+
+  const languageResult = {
+    primary: language,
+    secondary: null,
+    region: langInfo.region,
+    audienceNote: langInfo.audienceNote,
+  };
+
+  const trendingTopics = getTrendingTopics(niche, format);
+
+  return { niche: nicheResult, contentStyle, language: languageResult, trendingTopics };
 }
