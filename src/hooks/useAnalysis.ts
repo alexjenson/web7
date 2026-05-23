@@ -11,15 +11,10 @@ type State =
 
 export function useAnalysis() {
   const [state, setState] = useState<State>({ status: "idle" });
-  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
-
-  function clearTimers() {
-    timersRef.current.forEach(clearTimeout);
-    timersRef.current = [];
-  }
+  const lastInputRef = useRef<UserInput | null>(null);
 
   async function analyze(input: UserInput) {
-    clearTimers();
+    lastInputRef.current = input;
     setState({ status: "loading" });
 
     try {
@@ -40,10 +35,13 @@ export function useAnalysis() {
     }
   }
 
+  function refresh() {
+    if (lastInputRef.current) analyze(lastInputRef.current);
+  }
+
   function reset() {
-    clearTimers();
     setState({ status: "idle" });
   }
 
-  return { state, analyze, reset };
+  return { state, analyze, refresh, reset };
 }
