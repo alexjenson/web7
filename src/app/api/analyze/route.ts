@@ -33,10 +33,11 @@ export async function POST(request: Request) {
       );
     }
 
-    if (posts.length === 0) {
+    // Still analyze with just profile bio/category if no posts were scraped
+    if (posts.length === 0 && !profile.biography && !profile.category_name) {
       return errorResponse(
         "NO_POSTS",
-        "This account has no public posts to analyze",
+        "This account has no public posts or bio to analyze",
         422
       );
     }
