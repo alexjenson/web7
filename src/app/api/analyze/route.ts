@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { parseUsername } from "@/lib/parseUsername";
-import { fetchProfile, fetchPosts, InstagramAPIError } from "@/lib/instagram";
-import { analyzeWithClaude, ClaudeAnalysisError } from "@/lib/claude";
+import { fetchInstagramData, InstagramAPIError } from "@/lib/instagram";
+import { analyze } from "@/lib/analyzer";
 
 export const runtime = "nodejs";
 
@@ -19,15 +19,11 @@ export async function POST(request: Request) {
 
   const username = parseUsername(body.username ?? "");
   if (!username) {
-    return errorResponse(
-      "INVALID_INPUT",
-      "Enter a valid Instagram URL or username",
-      400
-    );
+    return errorResponse("INVALID_INPUT", "Enter a valid Instagram URL or username", 400);
   }
 
   try {
-    const profile = await fetchProfile(username);
+    const { profile, posts } = await fetchInstagramData(username);
 
     if (profile.is_private) {
       return errorResponse(
@@ -37,8 +33,6 @@ export async function POST(request: Request) {
       );
     }
 
-    const posts = await fetchPosts(username);
-
     if (posts.length === 0) {
       return errorResponse(
         "NO_POSTS",
@@ -47,8 +41,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const analysis = await analyzeWithClaude(profile, posts);
-
+    const analysis = analyze(profile, posts);
     return NextResponse.json({ profile, analysis });
   } catch (err) {
     if (err instanceof InstagramAPIError) {
@@ -56,23 +49,21 @@ export async function POST(request: Request) {
         USER_NOT_FOUND: 404,
         PRIVATE_ACCOUNT: 403,
         RATE_LIMITED: 429,
+        INSTAGRAM_BLOCKED: 403,
         INSTAGRAM_API_ERROR: 502,
       };
       const messageMap: Record<string, string> = {
         USER_NOT_FOUND: "That Instagram account doesn't seem to exist",
         PRIVATE_ACCOUNT: "This account is private — we can only analyze public profiles",
         RATE_LIMITED: "Too many requests — please try again in 30 seconds",
-        INSTAGRAM_API_ERROR: "Couldn't retrieve Instagram data right now — please try again",
+        INSTAGRAM_BLOCKED: "Instagram is temporarily blocking this request — please try again in a moment",
+        INSTAGRAM_API_ERROR: "Couldn't reach Instagram right now — please try again",
       };
       return errorResponse(
         err.code,
         messageMap[err.code] ?? err.message,
         statusMap[err.code] ?? 502
       );
-    }
-
-    if (err instanceof ClaudeAnalysisError) {
-      return errorResponse("AI_ERROR", "AI analysis failed — please try again", 503);
     }
 
     console.error("Unexpected error:", err);
