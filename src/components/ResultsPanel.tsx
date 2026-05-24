@@ -55,7 +55,7 @@ export function ResultsPanel({
         <LanguageCard language={analysis.language} />
       </div>
 
-      <TrendingTopicsCard topics={analysis.trendingTopics} />
+      <TrendingTopicsCard topics={analysis.trendingTopics} niche={analysis.niche.primary} />
     </div>
   );
 }

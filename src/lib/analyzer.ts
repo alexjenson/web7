@@ -214,7 +214,6 @@ const FORMAT_STYLE: Record<string, { tone: string; postingPattern: string; visua
 
 function getTrendingTopics(niche: string, format: string): TrendingTopic[] {
   const topics = TRENDING_TOPICS[niche] ?? GENERIC_TOPICS;
-  // Filter to prefer matching format, then fill with others
   const preferred = topics.filter(t =>
     format === "Mixed" || format === "Photos"
       ? true
