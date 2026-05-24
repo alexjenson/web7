@@ -11,6 +11,7 @@ import {
   Sparkles,
   Menu,
   X,
+  Mail,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -20,6 +21,7 @@ const NAV_ITEMS = [
   { href: '/analytics',      label: 'Analytics',      icon: BarChart3 },
   { href: '/savings',        label: 'Savings',        icon: Lightbulb },
   { href: '/chat',           label: 'AI Chat',        icon: MessageCircle },
+  { href: '/gmail-import',   label: 'Import Gmail',   icon: Mail },
 ];
 
 const APP_ROUTES = NAV_ITEMS.map(n => n.href);
