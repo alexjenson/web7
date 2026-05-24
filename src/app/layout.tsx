@@ -1,16 +1,17 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { AppShell } from "@/components/layout/AppShell";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Instagram AI Analyzer — Decode Your Account in Seconds",
+  title: "SubTrack — Stop Wasting Money on Forgotten Subscriptions",
   description:
-    "Paste your Instagram link and get AI-powered analysis of your niche, content style, language, and 10 trending topic ideas tailored just for you.",
+    "Track all your subscriptions in one place. Get AI-powered savings suggestions, cancellation scripts, and spending analytics. Free to start.",
   openGraph: {
-    title: "Instagram AI Analyzer",
-    description: "Instant AI analysis of your Instagram niche, style, and trending topics.",
+    title: "SubTrack — Subscription Management Made Simple",
+    description: "Track spending, find savings, and cancel with ease.",
     type: "website",
   },
 };
@@ -18,7 +19,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.className} antialiased`}>{children}</body>
+      <body className={`${inter.className} antialiased bg-gray-950 text-white`}>
+        <AppShell>{children}</AppShell>
+      </body>
     </html>
   );
 }
