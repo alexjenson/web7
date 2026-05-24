@@ -8,248 +8,319 @@ export interface ScriptMeta {
   estimatedTime: string;
 }
 
-// Average spoken words per minute
 const WPM = 150;
 
-function wordsToTime(wordCount: number): string {
-  const seconds = Math.round((wordCount / WPM) * 60);
+function wordsToTime(text: string): string {
+  const words = text.trim().split(/\s+/).length;
+  const seconds = Math.round((words / WPM) * 60);
   if (seconds < 60) return `~${seconds} sec`;
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;
   return s ? `~${m}m ${s}s` : `~${m} min`;
 }
 
-function tag(niche: string) {
+function nicheTag(niche: string) {
   return niche.replace(/[^a-zA-Z]/g, "");
 }
 
-// ─── Reel scripts ─────────────────────────────────────────────────────────────
+// ─── Reel ─────────────────────────────────────────────────────────────────────
 
 function reelShort(t: TrendingTopic, niche: string): string {
-  return `🎬 HOOK  (0–3 sec)
+  return `🎬 HOOK  (0 – 3 sec)
 "${t.hook}"
 
-🎙️ BODY  (3–27 sec)
-• [Your key insight about: ${t.title}]
-• [One surprising fact or tip your audience doesn't know]
+🎙️ BODY  (3 – 27 sec)
+"Most people in ${niche} skip this completely — and it's costing them results.
 
-📣 CTA  (last 3 sec)
-"Follow for more ${niche} tips!"
+I'm not going to sugarcoat it. Once I understood this, my content changed. My growth changed. Everything changed.
+
+Here's the short version of what actually matters."
+
+📣 CALL TO ACTION  (last 3 sec)
+"Save this and follow for more ${niche} content every week."
 
 📝 CAPTION
 ${t.hook}
+
+${t.title} — here's my honest take.
 
 Drop a 🔥 if this helped!
 
-#${tag(niche)} #[your niche hashtags]`;
+#${nicheTag(niche)} #trending #${nicheTag(niche)}creator`;
 }
 
 function reelMedium(t: TrendingTopic, niche: string): string {
-  return `🎬 HOOK  (0–3 sec)
+  return `🎬 HOOK  (0 – 3 sec)
 "${t.hook}"
 
-🎙️ BODY  (3–55 sec)
-• Open: Share a quick personal story tied to "${t.title}"
-• Point 1: [Your first insight — be specific, not generic]
-• Point 2: [A common mistake people make in ${niche}]
-• Point 3: [The fix — exactly what to do instead]
-• Close: One memorable one-liner that sticks
+🎙️ BODY  (3 – 55 sec)
+"I want to talk about something that took me way too long to figure out in ${niche}.
 
-📣 CTA  (last 5 sec)
-"Save this! And follow for more ${niche} content every week."
+${t.title} — sounds simple, right? But here's what almost nobody tells you.
+
+First: the creators who are actually growing right now are not doing more. They're doing less, better. They picked one specific thing and went all in.
+
+Second: your audience does not care about perfection. They care about honesty. The most vulnerable, unpolished version of your content will almost always outperform the overproduced version.
+
+Third — and this is the one I want you to really sit with — the gap between where you are and where you want to be is not a talent gap. It's a consistency gap.
+
+That's it. That's the whole thing."
+
+📣 CALL TO ACTION  (last 5 sec)
+"Save this so you can come back to it. And follow — I post ${niche} content every single week."
 
 📝 CAPTION
 ${t.hook}
 
-Here's what changed everything for me: [your insight]
+Here's what I wish someone told me earlier about ${niche}:
 
-Save this so you don't lose it 📌
-Drop a comment if you've experienced this too 👇
+The strategy is simple. The execution is where most people quit.
 
-#${tag(niche)} #trending #[your niche hashtags]`;
+Save this 📌 — you'll want it later.
+
+#${nicheTag(niche)} #trending #${nicheTag(niche)}tips #contentcreator`;
 }
 
 function reelLong(t: TrendingTopic, niche: string): string {
-  return `🎬 HOOK  (0–3 sec)
+  return `🎬 HOOK  (0 – 3 sec)
 "${t.hook}"
 
-🎙️ INTRO  (3–10 sec)
-Briefly say who you are and why you know this topic.
-Keep it to one sentence — don't lose them here.
+🎙️ INTRO  (3 – 10 sec)
+"I've been in ${niche} long enough to know what actually works — and today I'm breaking down everything on: ${t.title}."
 
-🎙️ BODY  (10–80 sec)
-• Point 1: Set up the problem — what most people get wrong about ${t.title}
-• Point 2: [Your first real insight — add a specific number or example]
-• Point 3: [The turning point — what changed your understanding]
-• Point 4: [The practical action — exactly what to do step by step]
-• Point 5: [The result — what changes when you apply this]
+🎙️ BODY  (10 – 80 sec)
+"Let's get into it.
 
-🎙️ CLOSE  (80–87 sec)
-"The bottom line on ${t.title}: [one powerful sentence]"
+Point one: most people start by asking 'what should I post?' That's the wrong question. The right question is 'who am I posting for?' Once you know that specific person — their fears, their goals, what keeps them up at night — everything becomes easier.
 
-📣 CTA  (last 3 sec)
-"Save this and follow — I post ${niche} content every week."
+Point two: the algorithm is not your enemy. The algorithm rewards content that people actually watch, save, and share. Which means if you focus on genuinely helping your audience in ${niche}, the algorithm will work for you — not against you.
+
+Point three: you will not figure this out from the outside looking in. You have to post. You have to fail publicly. The creators you admire have a hundred posts you've never seen — the ones that didn't work. That's how they got good.
+
+Point four: stop optimizing for likes. Likes are validation. Saves are trust. Shares are endorsements. Optimize for saves and shares and your account will grow faster than any hack or trend could ever do.
+
+Point five: ${t.title} is not a one-time thing. It's a direction. Stay consistent in that direction for longer than feels comfortable — and then stay a little longer. That's where the growth happens.
+
+The bottom line: this works. But only if you do."
+
+🎙️ CLOSE  (80 – 87 sec)
+"That's my full breakdown of ${t.title}. I hope something in there hit different for you."
+
+📣 CALL TO ACTION  (last 3 sec)
+"Save this. Follow. I'll see you in the next one."
 
 📝 CAPTION
 ${t.hook}
 
-I spent [time] figuring this out so you don't have to.
+${t.title} — I went deep on this one so you don't have to.
 
-Here's the short version: [your core insight]
+The part that surprised me most? Point four. Go back and read it.
 
-The part nobody talks about: [your surprising angle]
+Save this post before you scroll 📌
+Share it with a ${niche} creator who needs it 🔁
 
-Save this + follow for weekly ${niche} content 👇
-
-. . .
-#${tag(niche)} #trending #[your niche hashtags] #[location or audience tag]`;
+#${nicheTag(niche)} #trending #${nicheTag(niche)}tips #contentcreator #growthmindset`;
 }
 
-// ─── Carousel scripts ──────────────────────────────────────────────────────────
+// ─── Carousel ─────────────────────────────────────────────────────────────────
 
 function carouselShort(t: TrendingTopic, niche: string): string {
   return `📑 SLIDE 1 — Hook
 "${t.hook}"
 
 📑 SLIDE 2 — The Problem
-Why does ${t.title} matter? One sentence.
+Most ${niche} creators are focused on the wrong things.
+They're optimizing for likes when they should be optimizing for trust.
 
-📑 SLIDES 3–5 — The Value  (one point each)
-• Slide 3: [Key insight #1]
-• Slide 4: [Key insight #2]
-• Slide 5: [Key insight #3]
+📑 SLIDE 3 — The Insight
+${t.title}.
+This single focus area separates creators who plateau from creators who grow.
 
-📑 LAST SLIDE — CTA
-"Save this! Follow for more ${niche} tips."
+📑 SLIDE 4 — What to Do
+Show up consistently in ${niche}.
+Be specific, not broad.
+Serve one person so well that they share you with everyone they know.
+
+📑 SLIDE 5 — CTA
+Save this carousel.
+Follow for more ${niche} tips every week.
 
 📝 CAPTION
 ${t.hook}
-Swipe for the full breakdown 👉
 
-#${tag(niche)} #[your niche hashtags]`;
+Swipe for the full breakdown 👉
+Save this — you'll come back to it.
+
+#${nicheTag(niche)} #trending #${nicheTag(niche)}tips`;
 }
 
 function carouselMedium(t: TrendingTopic, niche: string): string {
   return `📑 SLIDE 1 — Hook
 "${t.hook}"
 
-📑 SLIDE 2 — The Problem / Context
-Explain why ${t.title} matters.
-Keep to under 20 words. One idea only.
+📑 SLIDE 2 — Why This Matters
+${t.title} is one of the most underrated topics in ${niche} right now.
+Most creators either ignore it or get it completely wrong.
+Here's what you actually need to know.
 
-📑 SLIDES 3–7 — The Value  (one point per slide)
-• Slide 3: [Your first key insight]
-• Slide 4: [Common mistake — and the fix]
-• Slide 5: [Specific example or stat that proves the point]
-• Slide 6: [Practical tip your audience can act on today]
-• Slide 7: [The surprising or counterintuitive angle]
+📑 SLIDE 3 — The Mistake Everyone Makes
+Trying to reach everyone.
+Posting for the algorithm instead of for a person.
+Waiting until things are perfect before hitting publish.
+All three of these kill growth — faster than any bad post ever could.
 
-📑 SLIDE 8 — Summary
-One sentence that captures the entire lesson.
+📑 SLIDE 4 — The Real Strategy
+Pick one person. Speak to them specifically.
+Give them something they can use today — not theory, not inspiration — something actionable.
+Do that consistently and your ${niche} account will grow on its own.
 
-📑 LAST SLIDE — CTA
-"Save this carousel before you scroll!
-Follow for more ${niche} tips every week."
+📑 SLIDE 5 — The Mindset Shift
+You are not competing with every creator in ${niche}.
+You are finding the people who are waiting for exactly what you have to say.
+Those people exist. Your job is to keep showing up until they find you.
+
+📑 SLIDE 6 — The Compound Effect
+One post rarely goes viral. But 50 consistent, specific, honest posts?
+That's a reputation. That's authority. That's a community.
+That's what you're actually building.
+
+📑 SLIDE 7 — The Bottom Line
+${t.title}.
+Stop thinking about it. Start executing it.
+Progress over perfection — always.
+
+📑 SLIDE 8 — CTA
+Save this carousel before you scroll.
+Follow for more ${niche} content every week.
 
 📝 CAPTION
 ${t.hook}
 
-Swipe through for the full breakdown 👉
+Swipe all the way through — slide 5 is the one most people skip 👉
 
-Save this — you'll come back to it. ✅
+Save this ✅ Share with a ${niche} creator who needs it 🔁
 
-#${tag(niche)} #trending #[your niche hashtags]`;
+#${nicheTag(niche)} #trending #${nicheTag(niche)}creator`;
 }
 
 function carouselLong(t: TrendingTopic, niche: string): string {
   return `📑 SLIDE 1 — Hook
 "${t.hook}"
 
-📑 SLIDE 2 — Why This Matters
-The core problem with ${t.title} that nobody talks about.
-One idea. Short text. High contrast design.
+📑 SLIDE 2 — Let's Be Honest
+${t.title} — this is a topic that gets talked about a lot in ${niche}.
+But most of the advice out there is either too vague or too advanced.
+This breakdown is different. Let's get into it.
 
-📑 SLIDE 3 — The Setup
-What most people believe (and why it's wrong).
+📑 SLIDE 3 — Mistake #1
+Starting with the wrong question.
+"What should I post?" is not the right place to begin.
+"Who am I posting for?" is. Everything else follows from there.
 
-📑 SLIDES 4–9 — Deep Dive  (one insight per slide)
-• Slide 4: [The #1 thing you need to understand]
-• Slide 5: [Real example — be specific, use numbers if possible]
-• Slide 6: [The counterintuitive angle — something they won't expect]
-• Slide 7: [Step-by-step action they can take today]
-• Slide 8: [Common pitfall to avoid]
-• Slide 9: [The result when done right — paint the picture]
+📑 SLIDE 4 — Mistake #2
+Confusing activity with progress.
+Posting five times a week with no strategy is not a plan. It's noise.
+Fewer, better posts beat more mediocre ones every single time.
+
+📑 SLIDE 5 — The Foundation
+Know your one person. Know their problem. Know what success looks like for them.
+Every piece of ${niche} content you create should serve that one person so well that they feel like you made it just for them.
+
+📑 SLIDE 6 — The Strategy That Works
+Show up consistently in one format.
+Master it before adding another.
+Let your audience tell you what they want more of — then give it to them better than anyone else.
+
+📑 SLIDE 7 — The Counterintuitive Truth
+Vulnerability outperforms polish.
+Your story of struggling is more powerful than your story of succeeding.
+The creators growing fastest in ${niche} right now are the ones being the most honest.
+
+📑 SLIDE 8 — The Long Game
+The creators who win in ${niche} are not the most talented.
+They're the most patient. They outlast everyone who gives up between months three and six.
+If you're still here at month twelve, you're already ahead of 90% of people who started with you.
+
+📑 SLIDE 9 — Advanced Move
+Once something is working — do not change it because you're bored.
+Your audience is not bored. They followed you for that. Keep delivering it.
+Boredom is a creator problem, not an audience problem.
 
 📑 SLIDE 10 — Summary
-"Here's what we covered:" — bullet list recap, 4–5 points max.
+${t.title}.
+One format. One person. One consistent message. That's the whole strategy.
+Execute it for six months straight and the results will speak for themselves.
 
-📑 LAST SLIDE — CTA
-"Save this for later 📌
-Share with someone who needs this.
-Follow for more ${niche} deep-dives every week."
+📑 SLIDE 11 — CTA
+Save this deep-dive before you scroll.
+Share it with a ${niche} creator who needs it.
+Follow for breakdowns like this every week.
 
 📝 CAPTION
 ${t.hook}
 
-I've been in ${niche} long enough to know this is misunderstood.
+This is the most detailed breakdown I've done on ${niche} growth strategy.
+Swipe all the way through — slide 7 is the one that changed everything for me.
 
-Swipe through — this one's worth the full read.
+Save this 📌 Share it 🔁 Follow for more ✅
 
-The key insight most people miss: [your angle]
-
-Save + follow for more breakdowns like this 👇
-
-. . .
-#${tag(niche)} #trending #[your niche hashtags] #deepdive`;
+#${nicheTag(niche)} #trending #${nicheTag(niche)}creator #deepdive #contentcreator`;
 }
 
-// ─── Static / Photo captions ───────────────────────────────────────────────────
+// ─── Static Photo ─────────────────────────────────────────────────────────────
 
 function staticShort(t: TrendingTopic, niche: string): string {
   return `📸 CAPTION
 ${t.hook}
 
-[Your 1–2 sentence insight about: ${t.title}]
+${t.title} — and once I understood this, everything about my ${niche} content changed.
 
-Save this 💾  |  Follow for more ${niche} tips
+Save this if it helped 💾
+Follow for more ${niche} tips ✅
 
-#${tag(niche)} #[your niche hashtags]`;
+#${nicheTag(niche)} #trending`;
 }
 
 function staticMedium(t: TrendingTopic, niche: string): string {
   return `📸 CAPTION
 ${t.hook}
 
-[Write 3–4 sentences expanding on: ${t.title}]
-[Add your personal perspective or a specific example]
-[Close with one actionable tip your audience can use today]
+${t.title}.
 
-Save this post if it resonated 💾
-Drop a comment — I'd love to hear your take 👇
+Here's what that looks like in practice: you stop creating content for the algorithm and start creating it for one specific person. That shift is everything. Your message gets clearer, your audience becomes more loyal, and the algorithm rewards you for it — not the other way around.
 
-#${tag(niche)} #trending #[your niche hashtags]`;
+The best ${niche} creators I know are not the most talented. They're the most consistent and the most honest. That's the real edge.
+
+Save this if it resonated 💾
+Follow for more ${niche} content every week ✅
+
+#${nicheTag(niche)} #trending #${nicheTag(niche)}creator`;
 }
 
 function staticLong(t: TrendingTopic, niche: string): string {
   return `📸 CAPTION
 ${t.hook}
 
-[Paragraph 1: Open with a personal story or relatable moment tied to ${t.title}]
+${t.title}.
 
-[Paragraph 2: Share the core insight — what you've learned, what changed, what most people miss]
+Let me be direct about what I've learned after doing this in ${niche} for a while.
 
-[Paragraph 3: Give the practical takeaway — specific, actionable, not generic]
+The creators who are building something real are not the ones with the best equipment or the most time. They're the ones who show up when it would be easier not to. They post when no one is watching. They refine their message when no one is asking them to.
 
-[Closing line: Something memorable that will stick with the reader]
+Here's the thing nobody tells you at the start: the early posts are supposed to be imperfect. They're how you learn what your audience actually cares about. Every post that didn't land is data. Every comment — good or bad — is your audience telling you something worth listening to.
 
-—
+${t.title} — that's the thread running through all of it. It's not a tactic. It's a direction.
 
-Save this post so you can come back to it 💾
-Share it with someone who needs to see this 🔁
-New here? Follow for more ${niche} content every week ✅
+If you're reading this and you're somewhere in the middle — not where you started but not where you want to be — I want you to know: that middle is where everyone quits. Don't quit there. The people who make it are the ones who kept going when the results weren't there yet.
 
-. . .
-#${tag(niche)} #trending #[your niche hashtags] #[location or audience tag]`;
+Save this post 💾
+Share it with a ${niche} creator who needs to hear it 🔁
+Follow for weekly content that actually helps ✅
+
+.
+.
+.
+#${nicheTag(niche)} #trending #${nicheTag(niche)}creator #contentcreator #growthmindset`;
 }
 
 // ─── Public API ───────────────────────────────────────────────────────────────
@@ -275,10 +346,9 @@ export function generateScript(
          : staticMedium(topic, niche);
   }
 
-  const wordCount = text.trim().split(/\s+/).length;
   return {
     text,
     characters: text.length,
-    estimatedTime: wordsToTime(wordCount),
+    estimatedTime: wordsToTime(text),
   };
 }
