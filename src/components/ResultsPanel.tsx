@@ -3,6 +3,7 @@ import { NicheCard } from "./cards/NicheCard";
 import { StyleCard } from "./cards/StyleCard";
 import { LanguageCard } from "./cards/LanguageCard";
 import { TrendingTopicsCard } from "./cards/TrendingTopicsCard";
+import { CustomerProfilesCard } from "./cards/CustomerProfilesCard";
 
 export function ResultsPanel({
   username,
@@ -56,6 +57,7 @@ export function ResultsPanel({
       </div>
 
       <TrendingTopicsCard topics={analysis.trendingTopics} niche={analysis.niche.primary} />
+      <CustomerProfilesCard profiles={analysis.potentialCustomers} />
     </div>
   );
 }

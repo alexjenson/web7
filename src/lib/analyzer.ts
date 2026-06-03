@@ -1,4 +1,5 @@
 import { UserInput, AnalysisResult, TrendingTopic } from "./types";
+import { getPotentialCustomers } from "./customerProfiles";
 
 // (old detection functions removed — analysis now based on user input)
 
@@ -258,6 +259,7 @@ export function analyzeFromInput(input: UserInput): AnalysisResult {
   };
 
   const trendingTopics = getTrendingTopics(niche, format);
+  const potentialCustomers = getPotentialCustomers(niche, format, language);
 
-  return { niche: nicheResult, contentStyle, language: languageResult, trendingTopics };
+  return { niche: nicheResult, contentStyle, language: languageResult, trendingTopics, potentialCustomers };
 }

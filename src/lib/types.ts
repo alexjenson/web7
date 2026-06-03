@@ -34,11 +34,26 @@ export interface TrendingTopic {
   rationale: string;
 }
 
+export interface CustomerProfile {
+  avatar: string;
+  name: string;
+  age: string;
+  occupation: string;
+  location: string;
+  goals: string[];
+  painPoints: string[];
+  contentWants: string;
+  followReason: string;
+  engagementScore: "High" | "Medium" | "Low";
+  purchasePotential: "High" | "Medium" | "Low";
+}
+
 export interface AnalysisResult {
   niche: NicheAnalysis;
   contentStyle: ContentStyleAnalysis;
   language: LanguageAnalysis;
   trendingTopics: TrendingTopic[];
+  potentialCustomers: CustomerProfile[];
 }
 
 export interface APISuccessResponse {
