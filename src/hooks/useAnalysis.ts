@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { APISuccessResponse, UserInput } from "@/lib/types";
+import { analyzeFromInput } from "@/lib/analyzer";
 
 type State =
   | { status: "idle" }
@@ -18,20 +19,11 @@ export function useAnalysis() {
     setState({ status: "loading" });
 
     try {
-      const res = await fetch("/api/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(input),
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        setState({ status: "error", code: data.error?.code ?? "UNKNOWN", message: data.error?.message ?? "Something went wrong" });
-      } else {
-        setState({ status: "success", data });
-      }
+      await new Promise(resolve => setTimeout(resolve, 700));
+      const analysis = analyzeFromInput(input);
+      setState({ status: "success", data: { username: input.username, analysis } });
     } catch {
-      setState({ status: "error", code: "NETWORK_ERROR", message: "Network error — please check your connection" });
+      setState({ status: "error", code: "ANALYSIS_ERROR", message: "Something went wrong — please try again." });
     }
   }
 
