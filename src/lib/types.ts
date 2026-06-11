@@ -46,6 +46,7 @@ export interface CustomerProfile {
   followReason: string;
   engagementScore: "High" | "Medium" | "Low";
   purchasePotential: "High" | "Medium" | "Low";
+  hashtags: string[];
 }
 
 export interface AnalysisResult {

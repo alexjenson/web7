@@ -12,6 +12,7 @@ interface ProfileBase {
   engagementScore: "High" | "Medium" | "Low";
   purchasePotential: "High" | "Medium" | "Low";
   preferredFormats: ("Reels" | "Photos" | "Carousels" | "Mixed")[];
+  hashtags?: string[];
 }
 
 // ─── Profile Database ──────────────────────────────────────────────────────────
@@ -30,6 +31,7 @@ const PROFILES: Record<string, ProfileBase[]> = {
       engagementScore: "High",
       purchasePotential: "High",
       preferredFormats: ["Reels", "Carousels"],
+      hashtags: ["fitnessmotivation", "workoutathome", "busygirlwellness"],
     },
     {
       avatar: "🎓",
@@ -43,6 +45,7 @@ const PROFILES: Record<string, ProfileBase[]> = {
       engagementScore: "High",
       purchasePotential: "Medium",
       preferredFormats: ["Reels", "Mixed"],
+      hashtags: ["collegefit", "budgetgym", "beginnerfitness"],
     },
     {
       avatar: "👩‍👧",
@@ -56,6 +59,7 @@ const PROFILES: Record<string, ProfileBase[]> = {
       engagementScore: "High",
       purchasePotential: "High",
       preferredFormats: ["Reels", "Carousels"],
+      hashtags: ["momfitness", "postpartumfitness", "homeworkoutmom"],
     },
     {
       avatar: "🏃",
@@ -69,6 +73,7 @@ const PROFILES: Record<string, ProfileBase[]> = {
       engagementScore: "Medium",
       purchasePotential: "High",
       preferredFormats: ["Carousels", "Mixed"],
+      hashtags: ["runningcommunity", "travelworkout", "athletelife"],
     },
     {
       avatar: "✨",
@@ -82,6 +87,7 @@ const PROFILES: Record<string, ProfileBase[]> = {
       engagementScore: "High",
       purchasePotential: "Medium",
       preferredFormats: ["Reels", "Carousels"],
+      hashtags: ["nurselife", "shiftworkhealth", "selfcarenurse"],
     },
   ],
 
@@ -884,6 +890,31 @@ const PROFILES: Record<string, ProfileBase[]> = {
   ],
 };
 
+// ─── Hashtags per niche (where to find this audience on Instagram) ────────────
+
+const NICHE_HASHTAGS: Record<string, string[]> = {
+  "Fitness & Wellness":           ["fitnessmotivation", "workoutathome", "healthylifestyle", "gymlife", "wellnessjourney", "fitfam", "weightlossjourney", "homeworkout"],
+  "Food & Cooking":               ["foodie", "homecooking", "mealprep", "easyrecipes", "healthyeating", "cookingathome", "foodphotography", "dinnerideas"],
+  "Travel":                       ["travelgram", "solotravel", "budgettravel", "wanderlust", "travelphotography", "traveltips", "adventuretravel", "digitalnomad"],
+  "Fashion":                      ["ootd", "fashionstyle", "outfitoftheday", "fashioninspo", "streetstyle", "thriftfashion", "sustainablefashion", "capsulewardrobe"],
+  "Beauty & Skincare":            ["skincareroutine", "skincareobsessed", "beautytips", "glowup", "cleanbeauty", "skincareaddict", "makeuptutorial", "selfcare"],
+  "Tech & Gadgets":               ["techtok", "productivity", "aitools", "gadgets", "techreview", "workfromhome", "techsetup", "softwaredeveloper"],
+  "Business & Entrepreneurship":  ["entrepreneur", "sidehustle", "smallbusiness", "businesstips", "passiveincome", "startuplife", "onlinebusiness", "entrepreneurmindset"],
+  "Photography & Videography":    ["photography", "photographer", "filmmaking", "contentcreator", "videography", "lightroom", "photoshoot", "behindthescenes"],
+  "Education & Learning":         ["studymotivation", "studytips", "selfimprovement", "learning", "studyaesthetic", "bookrecommendations", "personaldev", "onlinelearning"],
+  "Lifestyle":                    ["lifestyleblogger", "morningroutine", "slowliving", "intentionalliving", "selfimprovement", "minimalism", "dailyroutine", "mentalhealth"],
+  "Comedy & Entertainment":       ["funny", "comedy", "reelscomedy", "funnyvideos", "relatable", "humor", "comediansofinstagram", "entertainmentcreator"],
+  "Finance & Investing":          ["personalfinance", "investing", "financialfreedom", "moneytips", "stockmarket", "wealthbuilding", "budgeting", "debtfree"],
+  "Pets & Animals":               ["dogsofinstagram", "catsofinstagram", "petlovers", "dogtraining", "pethealth", "animallover", "puppylove", "petcare"],
+  "Nature & Sustainability":      ["sustainability", "ecofriendly", "zerowaste", "climateaction", "nature", "outdoors", "sustainableliving", "greenliving"],
+  "Art & Design":                 ["digitalart", "artistsoninstagram", "illustration", "uidesign", "graphicdesign", "artcommunity", "creativework", "designinspiration"],
+  "Music":                        ["musicproducer", "indieartist", "musicianlife", "newmusic", "songwriting", "musiccommunity", "unsigned", "musicmarketing"],
+  "Gaming":                       ["gamer", "gamingcommunity", "twitchstreamer", "esports", "gaming", "pcgaming", "consolegaming", "gamedev"],
+  "Parenting & Family":           ["momlife", "dadlife", "parenting", "newmom", "toddlerlife", "familyfirst", "gentleparenting", "parentingtips"],
+  "Sports":                       ["athlete", "sportslife", "running", "marathon", "training", "sportsperformance", "athletemindset", "sportsmotivation"],
+  "DIY & Crafts":                 ["diy", "crafts", "homediy", "diydecor", "handmade", "crafting", "etsyseller", "makerlife"],
+};
+
 // ─── Location adjustment by language ─────────────────────────────────────────
 
 const LANGUAGE_LOCATIONS: Record<string, string[]> = {
@@ -925,17 +956,29 @@ export function getPotentialCustomers(
   const scored = pool.map(p => ({ profile: p, score: scoreProfile(p, format) + Math.random() * 2 }));
   scored.sort((a, b) => b.score - a.score);
 
-  return scored.slice(0, count).map(({ profile: p }, i) => ({
-    avatar: p.avatar,
-    name: p.name,
-    age: p.age,
-    occupation: p.occupation,
-    location: locations[i % locations.length],
-    goals: p.goals,
-    painPoints: p.painPoints,
-    contentWants: p.contentWants,
-    followReason: p.followReason,
-    engagementScore: p.engagementScore,
-    purchasePotential: p.purchasePotential,
-  }));
+  const allHashtags = NICHE_HASHTAGS[niche] ?? ["instagram", "creator", "content"];
+
+  return scored.slice(0, count).map(({ profile: p }, i) => {
+    // Each profile gets 3 different hashtags from the pool, offset by index
+    const offset = i * 3;
+    const hashtags = p.hashtags ?? [
+      allHashtags[offset % allHashtags.length],
+      allHashtags[(offset + 1) % allHashtags.length],
+      allHashtags[(offset + 2) % allHashtags.length],
+    ];
+    return {
+      avatar: p.avatar,
+      name: p.name,
+      age: p.age,
+      occupation: p.occupation,
+      location: locations[i % locations.length],
+      goals: p.goals,
+      painPoints: p.painPoints,
+      contentWants: p.contentWants,
+      followReason: p.followReason,
+      engagementScore: p.engagementScore,
+      purchasePotential: p.purchasePotential,
+      hashtags,
+    };
+  });
 }
