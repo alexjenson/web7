@@ -5,12 +5,12 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "LeadHawk — Find B2B Leads & Contacts",
+  title: "LeadHawk — Healthcare Provider Lead Finder",
   description:
-    "Search 260M+ contacts and companies. Filter by title, industry, company size, location and tech stack, then export verified emails. A self-contained Apollo-style lead finder.",
+    "Search real US healthcare providers from the CMS NPPES NPI Registry. Filter by specialty, state, and city, then export names, phone numbers, and practice addresses to CSV. Apollo-style, powered by real public-record data.",
   openGraph: {
-    title: "LeadHawk — Find B2B Leads",
-    description: "The lead database for modern sales teams.",
+    title: "LeadHawk — Healthcare Provider Finder",
+    description: "Find real US healthcare providers. Filter, save, and export.",
     type: "website",
   },
 };

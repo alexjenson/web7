@@ -1,7 +1,5 @@
 "use client";
 
-import type { EmailStatus } from "@/lib/leads/types";
-
 const AVATAR_COLORS = [
   "bg-indigo-100 text-indigo-700",
   "bg-emerald-100 text-emerald-700",
@@ -12,6 +10,12 @@ const AVATAR_COLORS = [
   "bg-teal-100 text-teal-700",
 ];
 
+function hash(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+
 export function Avatar({ name, size = 36 }: { name: string; size?: number }) {
   const initials = name
     .split(" ")
@@ -19,9 +23,7 @@ export function Avatar({ name, size = 36 }: { name: string; size?: number }) {
     .slice(0, 2)
     .join("")
     .toUpperCase();
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) | 0;
-  const color = AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+  const color = AVATAR_COLORS[hash(name) % AVATAR_COLORS.length];
   return (
     <span
       className={`inline-flex shrink-0 items-center justify-center rounded-full font-semibold ${color}`}
@@ -32,18 +34,23 @@ export function Avatar({ name, size = 36 }: { name: string; size?: number }) {
   );
 }
 
-const EMAIL_META: Record<EmailStatus, { label: string; dot: string; text: string; bg: string }> = {
-  verified: { label: "Verified", dot: "bg-emerald-500", text: "text-emerald-700", bg: "bg-emerald-50" },
-  probable: { label: "Probable", dot: "bg-amber-500", text: "text-amber-700", bg: "bg-amber-50" },
-  unavailable: { label: "No email", dot: "bg-slate-400", text: "text-slate-500", bg: "bg-slate-100" },
+const GROUP_COLORS: Record<string, string> = {
+  Dental: "bg-sky-50 text-sky-700",
+  Dermatology: "bg-rose-50 text-rose-700",
+  "Family Medicine": "bg-emerald-50 text-emerald-700",
+  Chiropractic: "bg-amber-50 text-amber-700",
+  "Physical Therapy": "bg-teal-50 text-teal-700",
+  Optometry: "bg-violet-50 text-violet-700",
+  "Psychiatry & Neurology": "bg-indigo-50 text-indigo-700",
+  Pediatrics: "bg-pink-50 text-pink-700",
+  "Internal Medicine": "bg-cyan-50 text-cyan-700",
 };
 
-export function EmailStatusBadge({ status }: { status: EmailStatus }) {
-  const m = EMAIL_META[status];
+export function SpecialtyBadge({ group }: { group: string }) {
+  const color = GROUP_COLORS[group] ?? "bg-slate-100 text-slate-600";
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium ${m.bg} ${m.text}`}>
-      <span className={`h-1.5 w-1.5 rounded-full ${m.dot}`} />
-      {m.label}
+    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${color}`}>
+      {group}
     </span>
   );
 }

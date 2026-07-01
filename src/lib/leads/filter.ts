@@ -1,20 +1,15 @@
-import type { Filters, Lead } from "./types";
+import type { Filters, Provider } from "./types";
 
-export function filterLeads(leads: Lead[], f: Filters): Lead[] {
+export function filterProviders(providers: Provider[], f: Filters): Provider[] {
   const kw = f.keyword.trim().toLowerCase();
-  return leads.filter((l) => {
+  return providers.filter((p) => {
     if (kw) {
-      const hay = `${l.firstName} ${l.lastName} ${l.title} ${l.company.name} ${l.department}`.toLowerCase();
+      const hay = `${p.name} ${p.specialty} ${p.city} ${p.state} ${p.npi}`.toLowerCase();
       if (!hay.includes(kw)) return false;
     }
-    if (f.titles.length && !f.titles.includes(l.title)) return false;
-    if (f.seniorities.length && !f.seniorities.includes(l.seniority)) return false;
-    if (f.departments.length && !f.departments.includes(l.department)) return false;
-    if (f.industries.length && !f.industries.includes(l.company.industry)) return false;
-    if (f.sizes.length && !f.sizes.includes(l.company.size)) return false;
-    if (f.locations.length && !f.locations.includes(l.country)) return false;
-    if (f.emailStatuses.length && !f.emailStatuses.includes(l.emailStatus)) return false;
-    if (f.techStack.length && !f.techStack.every((t) => l.company.techStack.includes(t))) return false;
+    if (f.specialtyGroups.length && !f.specialtyGroups.includes(p.specialtyGroup)) return false;
+    if (f.states.length && !f.states.includes(p.state)) return false;
+    if (f.cities.length && !f.cities.includes(p.city)) return false;
     return true;
   });
 }
@@ -22,13 +17,8 @@ export function filterLeads(leads: Lead[], f: Filters): Lead[] {
 export function activeFilterCount(f: Filters): number {
   return (
     (f.keyword.trim() ? 1 : 0) +
-    f.titles.length +
-    f.seniorities.length +
-    f.departments.length +
-    f.industries.length +
-    f.sizes.length +
-    f.locations.length +
-    f.techStack.length +
-    f.emailStatuses.length
+    f.specialtyGroups.length +
+    f.states.length +
+    f.cities.length
   );
 }
