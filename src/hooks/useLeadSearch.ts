@@ -1,9 +1,9 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { LEADS } from "@/lib/leads/data";
-import { activeFilterCount, filterLeads } from "@/lib/leads/filter";
-import { EMPTY_FILTERS, type Filters, type Lead } from "@/lib/leads/types";
+import { PROVIDERS } from "@/lib/leads/data";
+import { activeFilterCount, filterProviders } from "@/lib/leads/filter";
+import { EMPTY_FILTERS, type Filters, type Provider } from "@/lib/leads/types";
 
 const PAGE_SIZE = 25;
 
@@ -15,7 +15,7 @@ export function useLeadSearch() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [saved, setSaved] = useState<Set<string>>(new Set());
 
-  const results = useMemo(() => filterLeads(LEADS, filters), [filters]);
+  const results = useMemo(() => filterProviders(PROVIDERS, filters), [filters]);
   const totalPages = Math.max(1, Math.ceil(results.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
   const pageLeads = useMemo(
@@ -52,7 +52,7 @@ export function useLeadSearch() {
 
   const toggleSelectPage = useCallback(() => {
     setSelected((prev) => {
-      const ids = pageLeads.map((l) => l.id);
+      const ids = pageLeads.map((p) => p.npi);
       const allSelected = ids.every((id) => prev.has(id));
       const next = new Set(prev);
       ids.forEach((id) => (allSelected ? next.delete(id) : next.add(id)));
@@ -78,12 +78,12 @@ export function useLeadSearch() {
     });
   }, []);
 
-  const selectedLeads = useMemo<Lead[]>(
-    () => LEADS.filter((l) => selected.has(l.id)),
+  const selectedLeads = useMemo<Provider[]>(
+    () => PROVIDERS.filter((p) => selected.has(p.npi)),
     [selected],
   );
-  const savedLeads = useMemo<Lead[]>(
-    () => LEADS.filter((l) => saved.has(l.id)),
+  const savedLeads = useMemo<Provider[]>(
+    () => PROVIDERS.filter((p) => saved.has(p.npi)),
     [saved],
   );
 
@@ -99,7 +99,7 @@ export function useLeadSearch() {
     currentPage,
     totalPages,
     setPage,
-    total: LEADS.length,
+    total: PROVIDERS.length,
 
     selected,
     selectedLeads,

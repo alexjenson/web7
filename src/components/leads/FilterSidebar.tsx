@@ -16,17 +16,13 @@ interface GroupDef {
 }
 
 const GROUPS: GroupDef[] = [
-  { key: "seniorities", label: "Seniority", values: FACETS.seniorities },
-  { key: "departments", label: "Department", values: FACETS.departments },
-  { key: "industries", label: "Industry", values: FACETS.industries, searchable: true },
-  { key: "sizes", label: "Company size (employees)", values: FACETS.sizes },
-  { key: "locations", label: "Location", values: FACETS.locations, searchable: true },
-  { key: "techStack", label: "Tech stack", values: FACETS.techStack, searchable: true },
-  { key: "emailStatuses", label: "Email status", values: FACETS.emailStatuses },
+  { key: "specialtyGroups", label: "Specialty", values: FACETS.specialtyGroups },
+  { key: "states", label: "State", values: FACETS.states, searchable: true },
+  { key: "cities", label: "City", values: FACETS.cities, searchable: true },
 ];
 
 function FacetGroup({ def, search }: { def: GroupDef; search: LeadSearch }) {
-  const [open, setOpen] = useState(def.key === "seniorities" || def.key === "departments");
+  const [open, setOpen] = useState(def.key !== "cities");
   const [q, setQ] = useState("");
   const selectedValues = search.filters[def.key] as string[];
   const values = def.searchable && q ? def.values.filter((v) => v.toLowerCase().includes(q.toLowerCase())) : def.values;
@@ -61,7 +57,7 @@ function FacetGroup({ def, search }: { def: GroupDef; search: LeadSearch }) {
               />
             </div>
           )}
-          <div className="max-h-52 space-y-0.5 overflow-y-auto pr-1">
+          <div className="max-h-56 space-y-0.5 overflow-y-auto pr-1">
             {values.map((v) => {
               const checked = selectedValues.includes(v);
               return (
@@ -75,7 +71,7 @@ function FacetGroup({ def, search }: { def: GroupDef; search: LeadSearch }) {
                     onChange={() => search.toggleFacet(def.key, v)}
                     className="h-3.5 w-3.5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                   />
-                  <span className="truncate capitalize">{v}</span>
+                  <span className="truncate">{v}</span>
                 </label>
               );
             })}
@@ -108,8 +104,10 @@ export function FilterSidebar({ search }: { search: LeadSearch }) {
         {GROUPS.map((g) => (
           <FacetGroup key={g.key} def={g} search={search} />
         ))}
-        <div className="py-4 text-center text-[11px] text-slate-400">
-          Demo dataset · {search.total} sample contacts
+        <div className="py-4 text-center text-[11px] leading-relaxed text-slate-400">
+          Real data · {search.total} US healthcare providers
+          <br />
+          Source: CMS NPPES NPI Registry
         </div>
       </div>
     </aside>
