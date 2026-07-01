@@ -5,12 +5,12 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Instagram Topic Analyzer — Find Your Next Viral Topic",
+  title: "LeadHawk — Find B2B Leads & Contacts",
   description:
-    "Get 10 trending topic ideas, full scripts, and potential customer profiles — tailored to your Instagram niche. Free and instant.",
+    "Search 260M+ contacts and companies. Filter by title, industry, company size, location and tech stack, then export verified emails. A self-contained Apollo-style lead finder.",
   openGraph: {
-    title: "Instagram Topic Analyzer",
-    description: "AI-powered content strategy for Instagram creators.",
+    title: "LeadHawk — Find B2B Leads",
+    description: "The lead database for modern sales teams.",
     type: "website",
   },
 };
@@ -18,9 +18,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} antialiased`}>
-        {children}
-      </body>
+      <body className={`${inter.className} antialiased`}>{children}</body>
     </html>
   );
 }
