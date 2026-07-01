@@ -1,9 +1,11 @@
+# Static export served at the domain root on Netlify.
+# The Next.js runtime plugin is intentionally omitted: `output: "export"`
+# produces a plain static site in ./out, so no server/adapter is needed.
 [build]
   command = "npm run build"
-  publish = ".next"
+  publish = "out"
 
 [build.environment]
   NODE_VERSION = "20"
-
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
+  # Serve at "/" on Netlify (GitHub Pages keeps the default "/web7").
+  PAGES_BASE_PATH = ""
