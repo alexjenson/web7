@@ -42,7 +42,7 @@ export function LeadFinder() {
           </span>
           <span className="ml-1 hidden text-xs font-medium text-slate-400 sm:inline">AI Lead Finder</span>
           <span className="ml-2 hidden items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700 sm:inline-flex">
-            <ShieldCheck className="h-3 w-3" /> Real NPI data
+            <ShieldCheck className="h-3 w-3" /> Verified leads
           </span>
         </div>
         <div className="flex items-center gap-2">

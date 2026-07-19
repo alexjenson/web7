@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "LeadHawk — AI Lead Finder for Healthcare Providers",
   description:
-    "AI lead finder for real US healthcare providers (CMS NPPES NPI Registry). Filter by specialty, state, and city, look up each lead's LinkedIn profile, generate personalized AI outreach, and export to CSV. Real public-record data, free.",
+    "AI lead finder for real US healthcare providers. Filter by specialty, state, and city, look up each lead's LinkedIn profile, generate personalized AI outreach, and export to CSV. Real public-record data, free.",
   openGraph: {
     title: "LeadHawk — Healthcare Provider Finder",
     description: "Find real US healthcare providers. Filter, save, and export.",

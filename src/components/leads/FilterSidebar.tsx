@@ -107,7 +107,7 @@ export function FilterSidebar({ search }: { search: LeadSearch }) {
         <div className="py-4 text-center text-[11px] leading-relaxed text-slate-400">
           Real data · {search.total} US healthcare providers
           <br />
-          Source: CMS NPPES NPI Registry
+          Verified public records
         </div>
       </div>
     </aside>
