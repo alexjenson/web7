@@ -69,7 +69,7 @@ export function LeadTable({ search, onOpen }: Props) {
                     <Avatar name={p.name} />
                     <div className="min-w-0">
                       <div className="truncate font-semibold text-slate-800">{p.name}</div>
-                      <div className="truncate text-xs text-slate-400">NPI {p.npi}</div>
+                      <div className="truncate text-xs text-slate-400">{p.phone}</div>
                     </div>
                   </div>
                 </td>

@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 import {
   Bookmark,
-  BadgeCheck,
   Check,
   Copy,
   ExternalLink,
@@ -216,15 +215,6 @@ export function LeadDetailDrawer({ provider, onClose, isSaved, onToggleSaved }: 
 
           <h3 className="mb-1 mt-4 text-xs font-bold uppercase tracking-wide text-slate-400">Provider</h3>
           <Row icon={<Stethoscope className="h-4 w-4" />} label="Specialty" value={p.specialty} />
-          <Row
-            icon={<BadgeCheck className="h-4 w-4" />}
-            label="NPI number"
-            value={
-              <a href={nppes} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">
-                {p.npi}
-              </a>
-            }
-          />
 
           <a
             href={nppes}
