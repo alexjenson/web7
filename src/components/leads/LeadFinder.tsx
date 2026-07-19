@@ -70,7 +70,7 @@ export function LeadFinder() {
                 <input
                   value={search.filters.keyword}
                   onChange={(e) => search.setKeyword(e.target.value)}
-                  placeholder="Search by name, specialty, city, or NPI…"
+                  placeholder="Search by name, specialty, or city…"
                   className="w-full rounded-lg border border-slate-200 py-2 pl-9 pr-3 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
                 />
               </div>

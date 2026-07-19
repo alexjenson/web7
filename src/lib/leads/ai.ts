@@ -86,7 +86,7 @@ export function generateOutreach(p: Provider, offerRaw: string, variant: number)
     openingMessage: `${opener} ${body}`,
     talkingPoints: [
       `${p.specialtyGroup} practice based in ${p.city}, ${p.state} — tailor the pitch to local patients.`,
-      `Reachable by phone at ${p.phone}; verify details on their NPPES record (NPI ${p.npi}).`,
+      `Reachable by phone at ${p.phone}.`,
       `Lead against a clear outcome: "${offer}".`,
     ],
   };
