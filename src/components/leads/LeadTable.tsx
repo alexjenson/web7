@@ -1,9 +1,10 @@
 "use client";
 
-import { ExternalLink, MapPin, Phone, Stethoscope } from "lucide-react";
+import { ExternalLink, MapPin, Phone, Stethoscope, UserSearch } from "lucide-react";
 import type { Provider } from "@/lib/leads/types";
 import type { LeadSearch } from "@/hooks/useLeadSearch";
-import { Avatar, SpecialtyBadge } from "./ui";
+import { leadScore, linkedInSearchUrl, scoreTier } from "@/lib/leads/ai";
+import { Avatar, ScoreBadge, SpecialtyBadge } from "./ui";
 
 interface Props {
   search: LeadSearch;
@@ -42,7 +43,7 @@ export function LeadTable({ search, onOpen }: Props) {
             <th className="px-3 py-2.5">Provider</th>
             <th className="px-3 py-2.5">Specialty</th>
             <th className="px-3 py-2.5">Location</th>
-            <th className="px-3 py-2.5">Phone</th>
+            <th className="px-3 py-2.5">AI score</th>
             <th className="px-3 py-2.5 text-right">Actions</th>
           </tr>
         </thead>
@@ -86,16 +87,19 @@ export function LeadTable({ search, onOpen }: Props) {
                   <div className="truncate text-xs text-slate-400">{p.street}</div>
                 </td>
                 <td className="px-3 py-3">
-                  <a
-                    href={`tel:${p.phone}`}
-                    onClick={(e) => e.stopPropagation()}
-                    className="font-medium text-slate-700 hover:text-indigo-600"
-                  >
-                    {p.phone}
-                  </a>
+                  <ScoreBadge score={leadScore(p)} tier={scoreTier(leadScore(p))} />
                 </td>
                 <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}>
                   <div className="flex items-center justify-end gap-1.5">
+                    <a
+                      href={linkedInSearchUrl(p)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="Find on LinkedIn"
+                      className="rounded-md p-1.5 text-slate-400 hover:bg-slate-100 hover:text-[#0a66c2]"
+                    >
+                      <UserSearch className="h-4 w-4" />
+                    </a>
                     <a
                       href={`tel:${p.phone}`}
                       title="Call"
