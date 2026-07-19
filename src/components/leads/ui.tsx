@@ -55,6 +55,17 @@ export function SpecialtyBadge({ group }: { group: string }) {
   );
 }
 
+export function ScoreBadge({ score, tier }: { score: number; tier: { label: string; color: string } }) {
+  return (
+    <span
+      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ${tier.color}`}
+      title={`AI fit score: ${score}/100`}
+    >
+      {score} · {tier.label}
+    </span>
+  );
+}
+
 export function Tag({ children }: { children: React.ReactNode }) {
   return (
     <span className="inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">

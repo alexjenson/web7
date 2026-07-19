@@ -40,6 +40,7 @@ export function LeadFinder() {
           <span className="text-lg font-bold tracking-tight text-slate-900">
             Lead<span className="text-indigo-600">Hawk</span>
           </span>
+          <span className="ml-1 hidden text-xs font-medium text-slate-400 sm:inline">AI Lead Finder</span>
           <span className="ml-2 hidden items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700 sm:inline-flex">
             <ShieldCheck className="h-3 w-3" /> Real NPI data
           </span>
