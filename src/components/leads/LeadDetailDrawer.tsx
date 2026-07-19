@@ -222,11 +222,11 @@ export function LeadDetailDrawer({ provider, onClose, isSaved, onToggleSaved }: 
             rel="noopener noreferrer"
             className="mt-4 flex items-center justify-center gap-2 rounded-lg border border-slate-200 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
           >
-            <ExternalLink className="h-4 w-4" /> Verify on official NPPES registry
+            <ExternalLink className="h-4 w-4" /> Verify on official registry
           </a>
           <p className="mt-3 text-center text-[11px] leading-relaxed text-slate-400">
-            Public-record data from the CMS National Provider Identifier registry. LinkedIn lookups open a
-            search — profiles are matched by name, specialty, and city.
+            Public-record healthcare provider data. LinkedIn lookups open a search — profiles are matched by
+            name, specialty, and city.
           </p>
         </div>
       </aside>
