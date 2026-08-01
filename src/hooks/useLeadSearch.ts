@@ -70,6 +70,14 @@ export function useLeadSearch() {
     });
   }, [selected]);
 
+  const saveMany = useCallback((ids: string[]) => {
+    setSaved((prev) => {
+      const next = new Set(prev);
+      ids.forEach((id) => next.add(id));
+      return next;
+    });
+  }, []);
+
   const toggleSaved = useCallback((id: string) => {
     setSaved((prev) => {
       const next = new Set(prev);
@@ -110,6 +118,7 @@ export function useLeadSearch() {
     saved,
     savedLeads,
     saveSelected,
+    saveMany,
     toggleSaved,
   };
 }

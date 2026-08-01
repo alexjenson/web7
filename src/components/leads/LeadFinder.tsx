@@ -3,6 +3,7 @@
 import { useState } from "react";
 import {
   Bookmark,
+  Bot,
   ChevronLeft,
   ChevronRight,
   Download,
@@ -18,12 +19,14 @@ import type { Provider } from "@/lib/leads/types";
 import { FilterSidebar } from "./FilterSidebar";
 import { LeadTable } from "./LeadTable";
 import { LeadDetailDrawer } from "./LeadDetailDrawer";
+import { Autopilot } from "./Autopilot";
 import { Avatar, SpecialtyBadge } from "./ui";
 
 export function LeadFinder() {
   const search = useLeadSearch();
   const [active, setActive] = useState<Provider | null>(null);
   const [showSaved, setShowSaved] = useState(false);
+  const [showAutopilot, setShowAutopilot] = useState(false);
 
   const { currentPage, totalPages, results, selectedLeads, savedLeads } = search;
   const rangeStart = results.length === 0 ? 0 : (currentPage - 1) * 25 + 1;
@@ -46,6 +49,12 @@ export function LeadFinder() {
           </span>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowAutopilot(true)}
+            className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:from-indigo-700 hover:to-violet-700"
+          >
+            <Bot className="h-4 w-4" /> Autopilot
+          </button>
           <button
             onClick={() => setShowSaved(true)}
             className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
@@ -211,6 +220,14 @@ export function LeadFinder() {
             </div>
           </aside>
         </>
+      )}
+
+      {showAutopilot && (
+        <Autopilot
+          search={search}
+          onClose={() => setShowAutopilot(false)}
+          onOpenLead={(lead) => setActive(lead.provider)}
+        />
       )}
 
       <LeadDetailDrawer

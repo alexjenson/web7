@@ -26,8 +26,13 @@ export function providersToCsv(providers: Provider[]): string {
   return [header, ...rows].join("\n");
 }
 
-export function downloadCsv(providers: Provider[], filename = "providers.csv"): void {
-  const blob = new Blob([providersToCsv(providers)], { type: "text/csv;charset=utf-8;" });
+/** Trigger a client-side download of arbitrary text as a file. */
+export function downloadText(
+  content: string,
+  filename: string,
+  mime = "text/csv;charset=utf-8;",
+): void {
+  const blob = new Blob([content], { type: mime });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -36,4 +41,8 @@ export function downloadCsv(providers: Provider[], filename = "providers.csv"): 
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+}
+
+export function downloadCsv(providers: Provider[], filename = "providers.csv"): void {
+  downloadText(providersToCsv(providers), filename);
 }
